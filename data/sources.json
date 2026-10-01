@@ -1,0 +1,12 @@
+{
+  "_comment": "自动同步的设置，一般不用动。换频道/换账号时才需要改这里。改完不用管，GitHub Actions 每 6 小时会自动跑一次。",
+  "youtube": {
+    "enabled": true,
+    "channelId": "UC4o0gnsaJyi_AevZO7XSxtA"
+  },
+  "bilibili": {
+    "enabled": false,
+    "mid": "458056589",
+    "disabledReason": "B 站接口对境外云 IP 一律返回 412 风控，GitHub Actions 的机器抓不到，所以这里默认关着。在你自己电脑上（国内网络）把 enabled 改成 true 就能一起抓。"
+  }
+}

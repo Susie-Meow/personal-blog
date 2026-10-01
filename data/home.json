@@ -1,0 +1,76 @@
+{
+  "_comment": "主页内容：大标题、导语、正文段落、最新视频（自动同步，显示在 Lately 小节里）、Lately 表格、页脚说明。",
+  "heading": {
+    "en": "Hi, I'm Susie Meow. Nice to meet you!",
+    "zh": "你好，我是 Susie Meow！"
+  },
+  "lede": {
+    "en": "You wanna touch my ears? Of course, touch them however you want… but people usually only do it a tiny bit. Why? Heheh, you’ll find out if you try, won’t you?",
+    "zh": "摸耳朵？可以哦，博士你想怎么摸都行，但是大家一般只会摸一下。为什么？嘻嘻，你摸摸看不就知道啦？"
+  },
+  "paragraphs": [
+    {
+      "en": "You might know me as 澄闪大猫猫 on Bilibili, 澄闪猫猫 on Douyin, or 澄閃大貓貓_GoldenglowCatto on YouTube. This page is where I keep all of it in one place.",
+      "zh": "你可能在 B 站见过我，名字是澄闪大猫猫；在抖音上叫澄闪猫猫；YouTube 上则叫澄閃大貓貓_GoldenglowCatto。这里是我把各处内容收在一起的地方。"
+    },
+    {
+      "en": [
+        { "text": "If you want to build a blog of your own, this project is open source on GitHub: " },
+        { "text": "https://susie-meow.github.io/personal-blog", "url": "https://susie-meow.github.io/personal-blog" }
+      ],
+      "zh": [
+        { "text": "如果你想自建 Blog，本项目已在 GitHub 开源：" },
+        { "text": "https://susie-meow.github.io/personal-blog", "url": "https://susie-meow.github.io/personal-blog" }
+      ]
+    }
+  ],
+  "video": {
+    "_note": "「最新视频」默认全自动：封面和标题来自 data/live.json，由 GitHub Actions 每 6 小时同步，你不用管。想在方框里直接播 B 站视频，就把 bvid 填成 BV 号（优先级最高）。image / url / linkText 只在自动同步没有数据时兜底，留空即可。",
+    "enabled": true,
+    "bvid": "",
+    "image": "",
+    "url": "",
+    "linkText": "",
+    "alt": { "en": "Cover of my latest upload", "zh": "我最新一条视频的封面" },
+    "autoLabel": { "en": "Latest on YouTube: ", "zh": "YouTube 最新：" },
+    "watchLabel": { "en": "Watch on Bilibili", "zh": "在 B 站观看" },
+    "suffix": { "en": " — my latest upload", "zh": " —— 我最新的一条视频" }
+  },
+  "lately": {
+    "title": { "en": "Lately", "zh": "最近在做什么" },
+    "items": [
+      {
+        "label": { "en": "Latest build", "zh": "最近做的东西" },
+        "value": {
+          "en": [
+            { "text": "Card Design Generator", "url": "https://susie-meow.github.io/card-design-generator/" },
+            { "text": ", or read the " },
+            { "text": "source on GitHub", "url": "https://github.com/Susie-Meow/card-design-generator" }
+          ],
+          "zh": [
+            { "text": "Card Design Generator", "url": "https://susie-meow.github.io/card-design-generator/" },
+            { "text": "，或者直接看 " },
+            { "text": "GitHub 上的源码", "url": "https://github.com/Susie-Meow/card-design-generator" }
+          ]
+        }
+      },
+      {
+        "label": { "en": "On Bilibili", "zh": "我的 B 站" },
+        "value": {
+          "en": [
+            { "text": "澄闪大猫猫", "url": "https://space.bilibili.com/458056589" },
+            { "text": " — where my videos live" }
+          ],
+          "zh": [
+            { "text": "澄闪大猫猫", "url": "https://space.bilibili.com/458056589" },
+            { "text": " —— 我的视频都发在这儿" }
+          ]
+        }
+      }
+    ]
+  },
+  "footnote": {
+    "en": "Copyright © Susie Meow. All rights reserved.",
+    "zh": "版权所有 © Susie Meow。保留所有权利。"
+  }
+}

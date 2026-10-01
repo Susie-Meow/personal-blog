@@ -1,0 +1,17 @@
+{
+  "_comment": "左侧栏的个人信息：头像、名字、一句话简介、底部状态行。favicon 是浏览器标签上的小图标。",
+  "favicon": "assets/avatar-youtube.jpg",
+  "avatar": {
+    "src": "assets/avatar-youtube.jpg",
+    "alt": { "en": "My avatar", "zh": "我的头像" }
+  },
+  "name": "Susie Meow",
+  "role": {
+    "en": "Welcome here! Just feel free to look around.",
+    "zh": "欢迎莅临～随便逛逛吧"
+  },
+  "status": {
+    "en": "Here since April 2020",
+    "zh": "Here since April 2020"
+  }
+}

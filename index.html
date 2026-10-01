@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Susie Meow</title>
+<meta id="metaDescription" name="description" content="" />
+<!-- a real href from the start, so the browser never asks for /favicon.ico; JS swaps in profile.favicon once it loads -->
+<link id="favicon" rel="icon" href="assets/avatar-youtube.jpg" />
+
+<!-- One family, Archivo: its width axis carries the hierarchy, weight does the rest.
+     Noto Sans SC only carries the Chinese copy. -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+
+<script>
+  /* set language before first paint so there is no flash of English */
+  try {
+    var saved = localStorage.getItem('site-lang');
+    if (saved === 'zh') { document.documentElement.lang = 'zh-CN'; }
+  } catch (e) {}
+</script>
+
+<style>
+/* ============================================================
+   TOKENS
+   Print shop: one grey stock, one ink, one spot colour (the
+   magenta of her own avatar). Hierarchy comes from rule weight
+   and type width, never from shadows or gradients.
+   ============================================================ */
+:root{
+  --stock:      #E9E8E2;   /* page: grey card stock */
+  --sheet:      #F5F4F0;   /* raised surface */
+  --sheet-hi:   #FBFAF7;
+
+  --ink:        #191521;   /* deep plum-black, a real colour rather than a tinted black */
+  --ink-2:      #575264;   /* secondary text */
+  --rule:       #CBC9C1;   /* hairline */
+  --rule-2:     rgba(25,21,33,.22);
+
+  --spot:       #FF2E7E;   /* the single spot ink */
+  --spot-text:  #B01250;   /* legible spot for running text */
+  --tint:       rgba(255,46,126,.10);
+
+  --sidebar-w: 300px;
+  --measure: 60ch;
+
+  --font: "Archivo", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+}
+
+*,*::before,*::after{ box-sizing:border-box; }
+
+html{ -webkit-text-size-adjust:100%; }
+
+body{
+  margin:0;
+  min-height:100vh;
+  background:var(--stock);
+  color:var(--ink);
+  font-family:var(--font);
+  font-size:16px;
+  font-weight:400;
+  line-height:1.68;
+  letter-spacing:-.004em;
+  -webkit-font-smoothing:antialiased;
+}
+
+a{ color:inherit; }
+
+:focus-visible{
+  outline:2px solid var(--spot-text);
+  outline-offset:3px;
+}
+
+.skip{
+  position:fixed; top:.6rem; left:.6rem; z-index:80;
+  transform:translateY(-200%);
+  background:var(--ink); color:var(--sheet);
+  padding:.55rem .9rem;
+  font-size:.82rem; text-decoration:none;
+  transition:transform .18s ease;
+}
+.skip:focus{ transform:none; }
+
+/* ============================================================
+   RAIL — same stock as the page, cut off by one heavy ink rule
+   ============================================================ */
+.plate{
+  position:fixed;
+  inset:0 auto 0 0;
+  width:var(--sidebar-w);
+  z-index:20;
+  display:flex;
+  flex-direction:column;
+  gap:1.25rem;
+  padding:36px 26px 26px;
+  background:var(--stock);
+  border-right:2px solid var(--ink);
+  overflow-y:auto;
+}
+
+/* the one flourish in the layout: the portrait is printed with the
+   spot plate 5px out of register */
+.avatar{
+  width:74px; height:74px;
+  display:block;
+  object-fit:cover;
+  border:1px solid var(--ink);
+  box-shadow:5px 5px 0 var(--spot);
+}
+.avatar-ring{ display:inline-block; line-height:0; }
+
+.identity .name{
+  margin:1rem 0 .3rem;
+  font-size:1.35rem;
+  font-weight:700;
+  font-variation-settings:"wdth" 94;
+  letter-spacing:-.018em;
+  line-height:1.15;
+}
+.identity .role{
+  margin:0;
+  font-size:.83rem;
+  line-height:1.6;
+  color:var(--ink-2);
+}
+
+.rule-line{
+  height:2px; border:0; margin:0;
+  background:var(--ink);
+}
+
+/* nav: a tally light in front of every row */
+.nav ul{ list-style:none; margin:0; padding:0; }
+.nav li + li{ border-top:1px solid var(--rule); }
+
+.nav a{
+  display:flex; align-items:center; gap:.75rem;
+  padding:.6rem 0;
+  color:var(--ink-2);
+  text-decoration:none;
+  font-size:.95rem; font-weight:500;
+  font-variation-settings:"wdth" 100;
+  transition:color .16s ease;
+}
+.nav a::before{
+  content:"";
+  flex:0 0 auto;
+  width:9px; height:9px;
+  border:1px solid var(--rule-2);
+  transition:background .16s ease, border-color .16s ease;
+}
+.nav a:hover{ color:var(--ink); }
+.nav a:hover::before{ border-color:var(--ink); }
+.nav a[aria-current="page"]{
+  color:var(--ink);
+  font-weight:600;
+}
+.nav a[aria-current="page"]::before{
+  background:var(--spot);
+  border-color:var(--spot);
+}
+
+/* language: two words and a slash, no chrome around them */
+.lang{
+  display:flex; align-items:center;
+  margin-top:-.35rem;
+  font-size:.8rem;
+  font-variation-settings:"wdth" 108;
+}
+.lang button{
+  appearance:none; border:0; background:none; padding:.15rem 0;
+  font:inherit; font-variation-settings:inherit;
+  color:var(--ink-2); cursor:pointer;
+  border-bottom:1px solid transparent;
+  transition:color .16s ease, border-color .16s ease;
+}
+.lang button:first-child::after{
+  content:"/"; margin:0 .5rem; color:var(--rule);
+}
+.lang button:hover{ color:var(--ink); }
+.lang button[aria-pressed="true"]{
+  color:var(--ink); font-weight:600;
+  border-bottom-color:var(--spot);
+}
+
+.plate-foot{
+  margin-top:auto; padding-top:1.5rem;
+  font-size:.76rem;
+  font-variation-settings:"wdth" 108;
+  letter-spacing:.01em;
+  color:var(--ink-2);
+  display:flex; align-items:center; gap:.55rem;
+}
+.plate-foot .dot{
+  width:8px; height:8px;
+  background:var(--spot);
+}
+
+/* ============================================================
+   CONTENT
+   ============================================================ */
+.main{
+  margin-left:var(--sidebar-w);
+  min-height:100vh;
+  padding:clamp(3rem, 8vh, 5.5rem) clamp(1.5rem, 5vw, 4.5rem) 6rem;
+}
+
+.panel{ max-width:var(--measure); display:none; }
+.panel.is-active{ display:block; }   /* a hard cut, not a fade-up */
+
+h1,h2,h3{ margin:0; font-weight:700; letter-spacing:-.02em; line-height:1.3; }
+
+.display{
+  margin:0 0 1.1rem;
+  font-size:clamp(1.95rem, 4.1vw, 2.85rem);
+  line-height:1.12;
+  font-variation-settings:"wdth" 92;
+  max-width:26ch;
+  text-wrap:balance;
+}
+
+.lede{
+  margin:0 0 1.4rem;
+  font-size:1.08rem;
+  line-height:1.7;
+  color:var(--ink-2);
+  max-width:48ch;   /* a little room so a long link in the intro never splits */
+}
+p{
+  margin:0 0 1.15rem;
+  max-width:56ch;
+  overflow-wrap:break-word;
+}
+p:last-child{ margin-bottom:0; }
+
+.section-title{
+  margin:3rem 0 1rem;
+  padding-top:.7rem;
+  border-top:2px solid var(--ink);
+  font-size:1.08rem;
+  font-variation-settings:"wdth" 104;
+  letter-spacing:-.008em;
+  line-height:1.35;
+  text-wrap:balance;
+}
+
+.link{
+  color:var(--spot-text);
+  text-decoration:underline;
+  text-decoration-thickness:1px;
+  text-underline-offset:2px;
+  transition:text-decoration-thickness .14s ease, background .14s ease;
+}
+.link:hover{
+  text-decoration-thickness:3px;
+  background:var(--tint);
+}
+
+/* the latest upload: real material, cropped back to 16:9 */
+.video{ margin:0 0 1.75rem; }
+/* the picture wrapper only — the caption's own link must stay inline,
+   otherwise it picks up the frame border and pushes the caption to a new line */
+.video > a{
+  display:block;
+  border:1px solid var(--ink);
+  transition:box-shadow .16s ease;
+}
+.video > a:hover{ box-shadow:inset 0 0 0 2px var(--spot); }
+.video img{
+  display:block; width:100%;
+  aspect-ratio:16 / 9;
+  object-fit:cover;
+}
+.video figcaption{
+  margin-top:.65rem;
+  font-size:.82rem;
+  color:var(--ink-2);
+}
+/* the embedded Bilibili player sits in the same 16:9 frame a still would */
+.video-embed{
+  display:block; width:100%;
+  aspect-ratio:16 / 9;
+  border:1px solid var(--ink);
+  background:var(--ink);
+}
+.video-more{ display:block; margin-top:.35rem; }
+
+/* rows: hairlines, and a marker underline where the pointer is */
+.rows{ list-style:none; margin:0; padding:0; }
+.rows > li{ border-bottom:1px solid var(--rule); }
+.rows > li:first-child{ border-top:1px solid var(--rule); }
+
+/* text starts on the same left edge as the headings; the hover wash and the
+   hairline share that edge, so nothing looks nudged out of line */
+.row{
+  display:flex; align-items:baseline; gap:2rem;
+  padding:1.15rem 0;
+  text-decoration:none;
+  transition:background .16s ease;
+}
+.row:hover{ background:var(--sheet); }
+
+.row-main{ flex:1 1 auto; min-width:0; }
+.row-title{
+  font-size:1.02rem;
+  font-variation-settings:"wdth" 96;
+  line-height:1.35;
+  margin-bottom:.3rem;
+}
+.row:hover .row-title{
+  text-decoration:underline;
+  text-decoration-thickness:2px;
+  text-decoration-color:var(--spot);
+  text-underline-offset:3px;
+}
+.row-note{
+  margin:0;
+  font-size:.89rem; line-height:1.62;
+  color:var(--ink-2); max-width:50ch;
+  overflow-wrap:break-word;
+}
+.row-meta{
+  flex:0 0 auto;
+  font-size:.78rem;
+  font-variation-settings:"wdth" 108;
+  color:var(--ink-2);
+  white-space:nowrap;
+}
+
+/* rundown table on the home page */
+.index{ margin:0; }
+.index div{
+  display:flex; align-items:baseline; gap:1.5rem;
+  padding:.85rem 0;
+  border-bottom:1px solid var(--rule);
+}
+.index div:first-child{ border-top:1px solid var(--ink); }
+.index dt{
+  flex:0 0 10rem;
+  font-size:.8rem;
+  font-variation-settings:"wdth" 108;
+  color:var(--ink-2);
+}
+.index dd{ margin:0; flex:1 1 auto; font-size:.94rem; overflow-wrap:break-word; }
+
+/* works: printed cards, ink border, no shadow */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap:1rem;
+  margin:0;
+}
+.grid > article{
+  min-width:0;
+  padding:1.3rem;
+  background:var(--sheet);
+  border:1px solid var(--ink);
+  transition:background .16s ease;
+}
+.grid > article:first-child{ border-top:3px solid var(--spot); }
+.grid > article:hover{ background:var(--sheet-hi); }
+.grid h3{
+  font-size:1.02rem;
+  font-variation-settings:"wdth" 96;
+  line-height:1.4;
+  margin-bottom:.45rem;
+}
+.grid .year{
+  display:block;
+  margin-bottom:.75rem;
+  font-size:.74rem; font-weight:500;
+  font-variation-settings:"wdth" 112;
+  letter-spacing:.03em;
+  color:var(--ink-2);
+}
+.grid p{
+  margin:0; max-width:none;
+  font-size:.89rem; line-height:1.62;
+  color:var(--ink-2);
+  overflow-wrap:break-word;
+}
+
+.foot{
+  margin:3rem 0 0; padding-top:1rem;
+  border-top:1px solid var(--rule);
+  font-size:.79rem; line-height:1.65;
+  color:var(--ink-2);
+  max-width:50ch;
+}
+
+/* a post: same column as the panels, one step narrower for long reading.
+   Body blocks are data (see data/posts/*.json) — this is only the type. */
+.post-back{
+  margin:0 0 1.5rem;
+  font-size:.82rem;
+  font-variation-settings:"wdth" 108;
+}
+.post-meta{
+  margin:.55rem 0 0;
+  font-size:.76rem; font-variation-settings:"wdth" 112;
+  letter-spacing:.02em;
+  color:var(--ink-2);
+}
+
+.prose{ max-width:56ch; }
+/* a post with no lede: without this the date sits flush against the first block,
+   because the first child's own top margin is zeroed just below */
+.post-meta + .prose{ margin-top:1.5rem; }
+.prose > *:first-child{ margin-top:0; }
+.prose > *:last-child{ margin-bottom:0; }
+
+/* top margins only, so the rhythm never doubles up */
+.prose p{ margin:1.05rem 0 0; }
+.prose h2{
+  margin:2.3rem 0 0;
+  font-size:1.1rem;
+  font-variation-settings:"wdth" 100;
+}
+.prose h3{
+  margin:1.8rem 0 0;
+  font-size:.99rem;
+}
+.prose ul,.prose ol{ margin:1.05rem 0 0; padding-left:1.2rem; }
+.prose li{ margin:.3rem 0; }
+.prose li::marker{ color:var(--spot-text); }
+
+.prose blockquote{
+  margin:1.5rem 0 0;
+  padding:.15rem 0 .15rem 1.1rem;
+  border-left:3px solid var(--spot);
+  color:var(--ink-2);
+}
+
+.prose pre{
+  margin:1.4rem 0 0;
+  padding:1rem 1.15rem;
+  overflow-x:auto;
+  background:var(--sheet);
+  border-left:3px solid var(--ink);
+  font-size:.83rem; line-height:1.62;
+}
+.prose code{
+  font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+/* emphasis inside a sentence, without the variable font drifting wider */
+.prose strong{ font-weight:700; font-variation-settings:"wdth" 100; }
+.prose p code,.prose li code{
+  background:var(--tint);
+  padding:.1em .35em;
+  font-size:.9em;
+}
+
+.prose figure{ margin:1.8rem 0 0; }
+.prose figure img{ display:block; width:100%; border:1px solid var(--ink); }
+.prose figure figcaption{
+  margin-top:.7rem;
+  font-size:.78rem; line-height:1.6;
+  color:var(--ink-2);
+}
+
+/* ============================================================
+   NARROW SCREENS — the rail becomes a masthead band
+   ============================================================ */
+@media (max-width: 940px){
+  /* the masthead and the content share one left edge */
+  .main{
+    margin-left:0;
+    padding:1.75rem clamp(1rem, 4vw, 1.5rem) 4.5rem;
+  }
+
+  .plate{
+    position:static; width:auto; inset:auto;
+    display:grid;
+    grid-template-columns:auto minmax(0,1fr) auto;
+    grid-template-areas:"av id lang" "nav nav nav";
+    align-items:center;
+    column-gap:.9rem; row-gap:.9rem;
+    padding:16px clamp(1rem, 4vw, 1.5rem) 14px;
+    border-right:0;
+    border-bottom:2px solid var(--ink);
+    overflow:visible;
+  }
+  .avatar-ring{ grid-area:av; }
+  .identity{ grid-area:id; min-width:0; }
+  .lang{ grid-area:lang; margin-top:0; }
+  .nav{ grid-area:nav; }
+
+  .avatar{ width:46px; height:46px; box-shadow:3px 3px 0 var(--spot); }
+  .identity .name{ margin:0 0 .1rem; font-size:1.08rem; }
+  .identity .role{
+    font-size:.78rem; line-height:1.5;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+
+  .rule-line{ display:none; }
+
+  .nav ul{
+    display:flex;
+    overflow-x:auto;
+    scrollbar-width:none;
+  }
+  .nav ul::-webkit-scrollbar{ display:none; }
+  .nav li + li{ border-top:0; }
+  .nav a{
+    white-space:nowrap;
+    padding:.3rem .85rem;
+    border-left:1px solid var(--rule);
+  }
+  .nav li:first-child a{ border-left:0; padding-left:.1rem; }
+  .nav a::before{ display:none; }
+  .nav a[aria-current="page"]{
+    text-decoration:underline;
+    text-decoration-thickness:2px;
+    text-decoration-color:var(--spot);
+    text-underline-offset:4px;
+  }
+
+  .plate-foot{ display:none; }
+
+  /* stacked rows: baseline alignment no longer applies across the column,
+     so both blocks switch to start alignment to keep one clean left edge */
+  .index div{ flex-direction:column; align-items:flex-start; gap:.2rem; padding:1rem 0; }
+  .index dt{ flex:none; }
+
+  .row{ flex-direction:column; align-items:flex-start; gap:.4rem; padding:1.1rem 0; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation:none !important; transition:none !important; }
+}
+</style>
+</head>
+
+<body>
+<a class="skip" href="#main" id="skip">Skip to content</a>
+
+<!-- ============ RAIL ============ -->
+<header class="plate">
+  <span class="avatar-ring">
+    <!-- same idea as the favicon: a real src from the start, so that if /data cannot be
+         read (double-clicking the file) the rail shows an avatar instead of a broken image -->
+    <img class="avatar" id="avatar" src="assets/avatar-youtube.jpg" alt="" width="74" height="74" />
+  </span>
+
+  <div class="identity">
+    <p class="name" id="profileName"></p>
+    <p class="role" id="profileRole"></p>
+  </div>
+
+  <hr class="rule-line" />
+
+  <nav class="nav" id="nav" aria-label="Sections">
+    <ul id="navList"></ul>
+  </nav>
+
+  <div class="lang" id="langSwitch" role="group"></div>
+
+  <p class="plate-foot"><span class="dot" aria-hidden="true"></span><span id="profileStatus"></span></p>
+</header>
+
+<!-- ============ CONTENT (rendered from /data) ============ -->
+<main class="main" id="main"></main>
+
+<script>
+/* ============================================================
+   Everything visible is rendered from the JSON files in /data.
+   Edit those files to change the site — this script stays as is.
+
+   data/site.json       navigation, languages, page titles
+   data/profile.json    avatar, name, tagline, status line
+   data/home.json       the Home panel
+   data/blog.json       the Blog panel
+   data/works.json      the Works panel
+   data/elsewhere.json  the Find me elsewhere panel
+   data/posts/*.json    one file per post, fetched the first time it is opened
+
+   A list item that carries a "post" field links to #post/<slug> instead of
+   an outside URL, and the post renders in place from its own JSON file.
+   ============================================================ */
+var STORE_KEY = 'site-lang';
+
+var state = {
+  site: null,
+  profile: null,
+  panels: {},   /* panel id -> json */
+  posts: {},    /* slug -> json, filled lazily by showPost() */
+  live: null,   /* data/live.json — written by the scheduled sync, may be absent */
+  lang: 'en',
+  current: ''   /* current route: a panel id, or "post/<slug>" */
+};
+
+/* ---------- helpers ---------- */
+function esc(value) {
+  return String(value === null || value === undefined ? '' : value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+/* a value may be a plain string, or { en: …, zh: … }, or rich parts */
+function localized(value, lang) {
+  if (value === null || value === undefined) { return ''; }
+  if (typeof value === 'string' || Array.isArray(value)) { return value; }
+  if (typeof value === 'object') {
+    if (value[lang] !== undefined) { return value[lang]; }
+    var fallback = (state.site && state.site.defaultLanguage) || 'en';
+    if (value[fallback] !== undefined) { return value[fallback]; }
+    var keys = Object.keys(value);
+    return keys.length ? value[keys[0]] : '';
+  }
+  return String(value);
+}
+
+/* rich parts: [ { text }, { text, url }, { text, code }, { text, strong } ] -> escaped html */
+function rich(value) {
+  if (Array.isArray(value)) {
+    return value.map(function (part) {
+      if (!part) { return ''; }
+      var text = esc(part.text === undefined ? '' : part.text);
+      if (part.url) { return '<a class="link" href="' + esc(part.url) + '">' + text + '</a>'; }
+      if (part.code) { return '<code>' + text + '</code>'; }
+      if (part.strong) { return '<strong>' + text + '</strong>'; }
+      return text;
+    }).join('');
+  }
+  return esc(value === undefined || value === null ? '' : value);
+}
+
+function field(value) { return rich(localized(value, state.lang)); }
+function plain(value) { return esc(localized(value, state.lang)); }
+
+/* ---------- loading ---------- */
+function loadJSON(path) {
+  return fetch(path, { cache: 'no-store' }).then(function (res) {
+    if (!res.ok) { throw new Error('HTTP ' + res.status); }
+    return res.json().then(function (json) { return json; }, function () {
+      throw new Error('not valid JSON');
+    });
+  }, function () {
+    throw new Error('could not be loaded');
+  });
+}
+
+function fail(path, reason) {
+  var main = document.getElementById('main');
+  var fileHint = path ? '<code>data/' + esc(path) + '</code>' : '';
+  main.innerHTML =
+    '<div class="panel is-active">' +
+      '<h1 class="display">Data could not be loaded / 数据没能读进来</h1>' +
+      '<p class="lede">There is a problem with ' + fileHint + ' — ' + esc(reason) + '. ' +
+      '检查这个文件里的逗号、引号是否配对。</p>' +
+      '<p class="foot">Opening this file straight from your hard drive (file://…) cannot read JSON. ' +
+      'Serve the folder over http, for example <code>python3 -m http.server 8000</code>, then visit ' +
+      '<code>http://localhost:8000</code>. On GitHub Pages everything works automatically. ' +
+      '双击 index.html 直接打开是读不到 JSON 的，需要用上面的本地服务器方式预览；发布到 GitHub Pages 后不受影响。</p>' +
+    '</div>';
+}
+
+/* ---------- rail ---------- */
+function renderRail() {
+  var profile = state.profile || {};
+  var avatar = profile.avatar || {};
+
+  var img = document.getElementById('avatar');
+  if (avatar.src) { img.src = avatar.src; }
+  img.alt = plain(avatar.alt);
+
+  document.getElementById('profileName').textContent = plain(profile.name);
+  document.getElementById('profileRole').innerHTML = field(profile.role);
+  document.getElementById('profileStatus').innerHTML = field(profile.status);
+  document.getElementById('skip').textContent = plain(state.site.skipLink);
+
+  if (avatar.src) { document.getElementById('favicon').href = profile.favicon || avatar.src; }
+  document.getElementById('metaDescription').content = plain(state.site.metaDescription);
+
+  document.documentElement.lang = (state.lang === 'zh') ? 'zh-CN' : 'en';
+
+  /* nav */
+  document.getElementById('navList').innerHTML = (state.site.nav || []).map(function (item) {
+    return '<li><a href="#' + esc(item.id) + '" data-nav="' + esc(item.id) + '">' +
+           field(item.label) + '</a></li>';
+  }).join('');
+
+  /* language switch */
+  var group = document.getElementById('langSwitch');
+  group.setAttribute('aria-label', plain(state.site.languageGroupLabel));
+  group.innerHTML = (state.site.languages || []).map(function (lang) {
+    return '<button type="button" data-lang="' + esc(lang.code) + '" aria-pressed="' +
+           (lang.code === state.lang ? 'true' : 'false') + '">' + esc(lang.label) + '</button>';
+  }).join('');
+  Array.prototype.forEach.call(group.querySelectorAll('button'), function (b) {
+    b.addEventListener('click', function () {
+      var code = b.getAttribute('data-lang');
+      if (code === state.lang) { return; }
+      state.lang = code;
+      try { localStorage.setItem(STORE_KEY, code); } catch (e) {}
+      render();
+    });
+  });
+}
+
+/* ---------- panels ---------- */
+/* ---------- the "latest video" slot ----------
+   Three states, in this order of priority:
+
+     1. video.bvid is filled in         -> Bilibili's own player, embedded.
+                                           Filling in one BV id is the only
+                                           manual step the site asks for.
+     2. data/live.json has an upload    -> its cover, title and link. All three
+                                           are written together by
+                                           tools/sync_latest.py, so the picture
+                                           and the caption cannot drift apart.
+     3. neither                         -> the hand-written video.image / .url
+                                           / .linkText, i.e. the old behaviour.
+
+   The browser never calls YouTube or Bilibili itself: neither sends CORS
+   headers (and Bilibili answers 412 to anything it doesn't like), so the
+   fetching happens outside the page, in a scheduled job.
+   ============================================ */
+function videoFigure(video) {
+  if (!video || !video.enabled) { return ''; }
+
+  var live = (state.live && state.live.youtube) || null;
+  var suffix = rich(localized(video.suffix, state.lang));
+
+  /* 1 — a BV id means she wants the Bilibili player in the frame */
+  if (video.bvid) {
+    var watch = 'https://www.bilibili.com/video/' + video.bvid;
+    var also = '';
+    if (live && live.url) {
+      also = '<span class="video-more">' + field(video.autoLabel) +
+               '<a class="link" href="' + esc(live.url) + '">' + esc(live.title) + '</a>' +
+             '</span>';
+    }
+    return '<figure class="video">' +
+             '<iframe class="video-embed" src="https://player.bilibili.com/player.html?bvid=' +
+               esc(video.bvid) + '&amp;page=1&amp;high_quality=1&amp;danmaku=0&amp;autoplay=0"' +
+               ' title="' + plain(video.alt) + '" loading="lazy"' +
+               ' scrolling="no" frameborder="0" allowfullscreen="true"></iframe>' +
+             '<figcaption><a class="link" href="' + esc(watch) + '">' +
+               field(video.watchLabel) + '</a>' + also + '</figcaption>' +
+           '</figure>';
+  }
+
+  /* 2 + 3 — a cover picture; the auto one only when the sync has run */
+  var cover = video.image || (live ? 'assets/auto-latest.jpg' : '');
+  if (!cover) { return ''; }
+
+  var url = (live && live.url) || video.url || '';
+  var caption = (live && live.title) || video.linkText || '';
+  var img = '<img src="' + esc(cover) + '" alt="' + plain(video.alt) + '" />';
+
+  return '<figure class="video">' +
+           (url ? '<a href="' + esc(url) + '">' + img + '</a>' : img) +
+           (caption
+             ? '<figcaption><a class="link" href="' + esc(url || '#') + '">' +
+                 esc(caption) + '</a>' + suffix + '</figcaption>'
+             : '') +
+         '</figure>';
+}
+
+function renderHome(id, data) {
+  var html = '<h1 class="display" id="' + esc(id) + '-title">' + field(data.heading) + '</h1>';
+  html += '<p class="lede">' + field(data.lede) + '</p>';
+
+  (data.paragraphs || []).forEach(function (para) {
+    html += '<p>' + field(para) + '</p>';
+  });
+
+  var videoHtml = videoFigure(data.video);
+
+  /* the latest video leads the "Lately" group, so the thumbnail sits under a
+     heading instead of floating between the prose and the next section */
+  var lately = data.lately;
+  if (lately && (lately.items || []).length) {
+    html += '<h2 class="section-title">' + field(lately.title) + '</h2>';
+    html += videoHtml;
+    html += '<dl class="index">';
+    (lately.items).forEach(function (item) {
+      html += '<div><dt>' + field(item.label) + '</dt><dd>' + field(item.value) + '</dd></div>';
+    });
+    html += '</dl>';
+  } else {
+    html += videoHtml;
+  }
+
+  /* no footnote here — renderPanels() appends it once for every layout */
+  return html;
+}
+
+function renderRows(items) {
+  if (!items || !items.length) { return ''; }
+  return '<ul class="rows">' + items.map(function (item) {
+    var inner = '<span class="row-main">' +
+                  '<h3 class="row-title">' + field(item.title) + '</h3>' +
+                  '<p class="row-note">' + field(item.note) + '</p>' +
+                '</span>';
+    if (item.meta) { inner += '<span class="row-meta">' + field(item.meta) + '</span>'; }
+
+    /* "post" opens a page inside the site; "url" sends the reader away */
+    var href = item.post ? '#post/' + item.post : (item.url || '');
+    return '<li>' +
+      (href ? '<a class="row" href="' + esc(href) + '">' + inner + '</a>'
+            : '<div class="row">' + inner + '</div>') +
+      '</li>';
+  }).join('') + '</ul>';
+}
+
+function renderCards(items) {
+  if (!items || !items.length) { return ''; }
+  return '<div class="grid">' + items.map(function (item) {
+    var title = field(item.title);
+    if (item.url) { title = '<a class="link" href="' + esc(item.url) + '">' + title + '</a>'; }
+    return '<article>' +
+      (item.year ? '<span class="year">' + field(item.year) + '</span>' : '') +
+      '<h3>' + title + '</h3>' +
+      '<p>' + field(item.note) + '</p>' +
+    '</article>';
+  }).join('') + '</div>';
+}
+
+/* ---------- posts ----------
+   A post is one file: data/posts/<slug>.json. Its body is a list of blocks,
+   and the single key of each block decides the element, so writing a post
+   stays data work rather than markup work:
+
+     { "p": … }          a paragraph
+     { "h2": … }         a sub-heading          { "h3": … } a smaller one
+     { "ul": [ … ] }     a bulleted list        { "ol": [ … ] } a numbered one
+     { "quote": … }      a pull quote
+     { "code": "…" }     a preformatted block (same in both languages)
+     { "img": { "src": …, "alt": …, "caption": … } }
+
+   Every text value may be a plain string, { "en": …, "zh": … }, or the rich
+   parts array the rest of the site uses for links inside a sentence.
+   Rich parts are [ { text }, { text, url }, { text, code }, { text, strong } ]. */
+function renderBlocks(body) {
+  if (!Array.isArray(body)) { return ''; }
+  return body.map(function (block) {
+    if (!block) { return ''; }
+    if (block.p !== undefined)     { return '<p>' + field(block.p) + '</p>'; }
+    if (block.h2 !== undefined)    { return '<h2>' + field(block.h2) + '</h2>'; }
+    if (block.h3 !== undefined)    { return '<h3>' + field(block.h3) + '</h3>'; }
+    if (block.quote !== undefined) { return '<blockquote>' + field(block.quote) + '</blockquote>'; }
+    if (block.code !== undefined)  { return '<pre><code>' + plain(block.code) + '</code></pre>'; }
+    if (block.ul !== undefined)    { return '<ul>' + listItems(block.ul) + '</ul>'; }
+    if (block.ol !== undefined)    { return '<ol>' + listItems(block.ol) + '</ol>'; }
+    if (block.img !== undefined)   { return postFigure(block.img); }
+    return '';
+  }).join('');
+}
+
+function listItems(items) {
+  if (!Array.isArray(items)) { return ''; }
+  return items.map(function (item) { return '<li>' + field(item) + '</li>'; }).join('');
+}
+
+function postFigure(img) {
+  if (!img || !img.src) { return ''; }
+  return '<figure>' +
+           '<img src="' + esc(img.src) + '" alt="' + plain(img.alt) + '" />' +
+           (img.caption ? '<figcaption>' + field(img.caption) + '</figcaption>' : '') +
+         '</figure>';
+}
+
+/* Which panel's list does this slug belong to? Gives the way back and decides
+   which nav item stays highlighted while reading. */
+function postOwner(slug) {
+  var owner = '';
+  Object.keys(state.panels).forEach(function (id) {
+    var items = (state.panels[id] && state.panels[id].items) || [];
+    items.forEach(function (item) { if (item && item.post === slug) { owner = id; } });
+  });
+  return owner;
+}
+
+function renderPost(post, owner) {
+  var label = '';
+  (state.site.nav || []).forEach(function (item) { if (item.id === owner) { label = item.label; } });
+
+  var html = '<p class="post-back"><a class="link" href="#' + esc(owner) + '">← ' +
+             field(label) + '</a></p>';
+  html += '<h1 class="display">' + field(post.title) + '</h1>';
+  if (post.date) { html += '<p class="post-meta">' + esc(post.date) + '</p>'; }
+  if (post.lede) { html += '<p class="lede">' + field(post.lede) + '</p>'; }
+  html += '<div class="prose">' + renderBlocks(post.body) + '</div>';
+  if (post.footnote) { html += '<p class="foot">' + field(post.footnote) + '</p>'; }
+  return html;
+}
+
+function renderPanels() {
+  var main = document.getElementById('main');
+  main.innerHTML = '';
+
+  (state.site.nav || []).forEach(function (item) {
+    var data = state.panels[item.id];
+    if (!data) { return; }
+
+    var heading = '<h1 class="display" id="' + esc(item.id) + '-title">' + field(data.heading) + '</h1>' +
+                  '<p class="lede">' + field(data.lede) + '</p>';
+
+    var body = '';
+    if (item.layout === 'home') { body = renderHome(item.id, data); }
+    else if (item.layout === 'cards') { body = heading + renderCards(data.items); }
+    else { body = heading + renderRows(data.items); }
+    if (data.footnote) { body += '<p class="foot">' + field(data.footnote) + '</p>'; }
+
+    var section = document.createElement('section');
+    section.className = 'panel';
+    section.id = item.id;
+    section.setAttribute('aria-labelledby', item.id + '-title');
+    section.innerHTML = body;
+    section.hidden = true;
+    main.appendChild(section);
+  });
+}
+
+/* ---------- section switching ---------- */
+function highlightNav(navId) {
+  Array.prototype.forEach.call(document.querySelectorAll('.nav a[data-nav]'), function (a) {
+    if (a.getAttribute('data-nav') === navId) { a.setAttribute('aria-current', 'page'); }
+    else { a.removeAttribute('aria-current'); }
+  });
+}
+
+/* one place decides what is on screen, so a post and a panel cannot both show */
+function revealPanel(section, navId) {
+  Array.prototype.forEach.call(document.querySelectorAll('#main > .panel'), function (p) {
+    var on = (p === section);
+    p.classList.toggle('is-active', on);
+    p.hidden = !on;
+  });
+  highlightNav(navId);
+  window.scrollTo(0, 0);
+}
+
+function showPanel(requested) {
+  var panels = Array.prototype.slice.call(document.querySelectorAll('.panel'));
+  if (!panels.some(function (p) { return p.id === requested; })) { requested = 'home'; }
+  if (!document.getElementById(requested)) {
+    requested = panels.length ? panels[0].id : '';
+  }
+  state.current = requested;
+  revealPanel(document.getElementById(requested), requested);
+
+  var current = (state.site.nav || []).filter(function (n) { return n.id === requested; })[0];
+  document.title = current ? plain(current.title) : '';
+}
+
+/* A post is fetched the first time it is opened and then kept, so switching
+   language re-renders from the cached file and stays instant. */
+function showPost(slug) {
+  state.current = 'post/' + slug;
+
+  var nav = state.site.nav || [];
+  var owner = postOwner(slug) || (nav[0] && nav[0].id) || 'home';
+
+  var paint = function (post) {
+    var main = document.getElementById('main');
+    var section = document.getElementById('post-panel');
+    if (!section) {
+      section = document.createElement('section');
+      section.className = 'panel';
+      section.id = 'post-panel';
+      main.appendChild(section);
+    }
+    section.innerHTML = renderPost(post, owner);
+    revealPanel(section, owner);
+    document.title = plain(post.title) + ' — ' + plain((state.profile || {}).name || '');
+  };
+
+  if (state.posts[slug]) { paint(state.posts[slug]); return; }
+  loadJSON('data/posts/' + slug + '.json').then(function (post) {
+    state.posts[slug] = post;
+    /* the reader may have clicked away while this was in flight */
+    if (state.current === 'post/' + slug) { paint(post); }
+  }).catch(function (e) {
+    fail('posts/' + slug + '.json', e.message);
+  });
+}
+
+function routeFromHash() {
+  return (location.hash || '').replace(/^#/, '');
+}
+
+function applyRoute(route) {
+  var post = /^post\/(.+)$/.exec(route || '');
+  if (post) { showPost(decodeURIComponent(post[1])); return; }
+  showPanel(route);
+}
+
+function render() {
+  renderRail();
+  renderPanels();
+  applyRoute(state.current || routeFromHash() || 'home');
+}
+
+/* ---------- start ---------- */
+(function boot() {
+  var savedLang = 'en';
+  try {
+    var saved = localStorage.getItem(STORE_KEY);
+    if (saved) { savedLang = saved; }
+  } catch (e) {}
+
+  Promise.all([
+    loadJSON('data/site.json').catch(function (e) { throw { path: 'site.json', reason: e.message }; }),
+    loadJSON('data/profile.json').catch(function (e) { throw { path: 'profile.json', reason: e.message }; }),
+    /* data/live.json is written by the scheduled job in .github/workflows.
+       It may not exist yet (or the job may have failed) — never a reason to
+       break the page, so a miss quietly becomes null and the page falls back. */
+    loadJSON('data/live.json').catch(function () { return null; })
+  ]).then(function (first) {
+    state.site = first[0];
+    state.profile = first[1];
+    state.live = first[2];
+
+    /* keep the remembered language only if the file still offers it */
+    var codes = (state.site.languages || []).map(function (l) { return l.code; });
+    state.lang = codes.indexOf(savedLang) >= 0 ? savedLang : (state.site.defaultLanguage || codes[0] || 'en');
+
+    return Promise.all((state.site.nav || []).map(function (item) {
+      var file = item.dataFile || (item.id + '.json');
+      return loadJSON('data/' + file).catch(function (e) { throw { path: file, reason: e.message }; });
+    }));
+  }).then(function (panelData) {
+    (state.site.nav || []).forEach(function (item, i) { state.panels[item.id] = panelData[i]; });
+    render();
+    window.addEventListener('hashchange', function () {
+      applyRoute(routeFromHash());
+    });
+  }).catch(function (err) {
+    fail(err && err.path, (err && err.reason) || 'unknown error');
+  });
+})();
+</script>
+</body>
+</html>

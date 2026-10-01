@@ -1,0 +1,44 @@
+{
+  "_comment": "站点配置：语言、导航顺序、板块与浏览器标签标题。_comment 只是给人看的备注，删掉不影响网站。",
+  "defaultLanguage": "en",
+  "languages": [
+    { "code": "en", "label": "English" },
+    { "code": "zh", "label": "中文" }
+  ],
+  "languageGroupLabel": { "en": "Language", "zh": "语言" },
+  "skipLink": { "en": "Skip to content", "zh": "跳到正文" },
+  "metaDescription": {
+    "en": "Susie Meow — Just feel free to look around.",
+    "zh": "Susie Meow —— 欢迎莅临～随便逛逛吧"
+  },
+  "nav": [
+    {
+      "id": "home",
+      "layout": "home",
+      "dataFile": "home.json",
+      "label": { "en": "Home", "zh": "主页" },
+      "title": { "en": "Susie Meow", "zh": "Susie Meow" }
+    },
+    {
+      "id": "blog",
+      "layout": "list",
+      "dataFile": "blog.json",
+      "label": { "en": "Blog", "zh": "博客" },
+      "title": { "en": "Blog — Susie Meow", "zh": "博客 — Susie Meow" }
+    },
+    {
+      "id": "works",
+      "layout": "cards",
+      "dataFile": "works.json",
+      "label": { "en": "Works", "zh": "作品" },
+      "title": { "en": "Works — Susie Meow", "zh": "作品 — Susie Meow" }
+    },
+    {
+      "id": "elsewhere",
+      "layout": "list",
+      "dataFile": "elsewhere.json",
+      "label": { "en": "Find me elsewhere", "zh": "在别处找我" },
+      "title": { "en": "Elsewhere — Susie Meow", "zh": "在别处 — Susie Meow" }
+    }
+  ]
+}

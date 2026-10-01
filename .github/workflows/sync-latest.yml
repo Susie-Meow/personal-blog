@@ -1,0 +1,45 @@
+name: Sync latest video
+
+# 每 6 小时去 YouTube 抓一次最新投稿，写进 data/live.json 并提交。
+# 网站本身仍然是纯静态的 —— 访客的浏览器不会请求任何第三方接口，
+# 只是读这个由机器人维护好的本地文件。
+#
+# 也可以在 Actions 页面点 "Run workflow" 手动跑一次。
+
+on:
+  schedule:
+    # 每天 0:17 / 6:17 / 12:17 / 18:17（UTC）。错开整点，避开 GitHub 的排队高峰。
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-latest
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Fetch the latest upload
+        run: python3 tools/sync_latest.py
+
+      - name: Commit when something changed
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "没有变化，不需要提交。"
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/live.json assets/auto-latest.jpg
+          git commit -m "chore: sync latest video [skip ci]"
+          git push

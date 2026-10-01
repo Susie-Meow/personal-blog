@@ -1,0 +1,7 @@
+# Finder / 系统产生的垃圾文件，不要提交
+.DS_Store
+Thumbs.db
+
+# Python 运行时缓存（跑同步脚本时会自动生成）
+__pycache__/
+*.pyc

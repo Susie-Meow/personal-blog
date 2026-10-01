@@ -1,0 +1,15 @@
+{
+  "_comment": "这个文件是自动生成的，请勿手动修改 —— 改它会被下次同步覆盖。内容由 tools/sync_latest.py 写入，GitHub Actions 每 6 小时跑一次。",
+  "generatedAt": "2026-09-29T01:29:27Z",
+  "youtube": {
+    "channelId": "UC4o0gnsaJyi_AevZO7XSxtA",
+    "videoId": "VHCDfb-qJDg",
+    "title": "Windows PC無線控制iPhone的開源神器！清晰流暢不卡頓！",
+    "published": "2026-09-21T16:49:37+00:00",
+    "url": "https://www.youtube.com/watch?v=VHCDfb-qJDg",
+    "thumbnail": "assets/auto-latest.jpg",
+    "channelUrl": "https://www.youtube.com/channel/UC4o0gnsaJyi_AevZO7XSxtA",
+    "entryCount": 3
+  },
+  "bilibiliState": "B 站接口对境外云 IP 一律返回 412 风控，GitHub Actions 的机器抓不到，所以这里默认关着。在你自己电脑上（国内网络）把 enabled 改成 true 就能一起抓。"
+}

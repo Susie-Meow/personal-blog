@@ -1,0 +1,23 @@
+{
+  "_comment": "博客板块：标题、导语、条目列表（items 里每加一组 { } 就多一条）、页脚说明。条目写 post 字段就点进站内文章页（对应 data/posts/<slug>.json）；写 url 字段就跳到外部网址。两个都写时以 post 为准。",
+  "heading": { "en": "Things I've written.", "zh": "我写的东西。" },
+  "lede": {
+    "en": "Occasionally I write about what I'm working on and my daily life.",
+    "zh": "偶尔写点我在做的东西和日常。"
+  },
+  "items": [
+    {
+      "title": { "en": "How this site is built", "zh": "搭建本站的一点思路" },
+      "note": {
+        "en": "No framework, no build step, no server — what that costs and what it buys.",
+        "zh": "没有框架、没有构建步骤、没有服务器： 这么做付出了什么，又换来了什么。"
+      },
+      "meta": "2026-09-30",
+      "post": "how-this-site-was-built"
+    }
+  ],
+  "footnote": {
+    "en": "Adding a post means dropping one JSON file into data/posts/ and adding one entry here, no code changes. Copyright © Susie Meow. All rights reserved.",
+    "zh": "新增一篇只要在 data/posts/ 里放一个 JSON 文件，再在这个列表里加一条，不需要写代码。版权所有 © Susie Meow。保留所有权利。"
+  }
+}

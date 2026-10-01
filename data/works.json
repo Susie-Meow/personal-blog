@@ -1,0 +1,41 @@
+{
+  "_comment": "作品板块：标题、导语、卡片列表（items 里每加一组 { } 就多一张卡片）、页脚说明。year 可以是年份文字，也可以写“soon”。url 留空则标题不是链接。",
+  "heading": { "en": "Things I've built.", "zh": "我做过的东西。" },
+  "lede": {
+    "en": "Mainly open-source projects on GitHub, and occasionally some other stuff.",
+    "zh": "主要是 Github 的开源项目，偶尔会放点别的。"
+  },
+  "items": [
+    {
+      "year": "2026",
+      "title": { "en": "Card Design Generator", "zh": "Card Design Generator" },
+      "note": {
+        "en": "A pure front-end card face design generator for ISO 7810 ID-1 (85.60×53.98mm). Upload a background and logos, freely position/scale/rotate, add logo outlines, export 1536×969 PNG (~455 DPI). Bilingual.",
+        "zh": "纯前端卡面设计生成器，按 ISO 7810 ID-1（85.60×53.98mm）制作卡面。上传底图与 logo，自由摆放、缩放、旋转，可为 logo 添加描边，导出 1536×969 PNG（约 455 DPI），中英双语。"
+      },
+      "url": "https://github.com/Susie-Meow/card-design-generator"
+    },
+    {
+      "year": { "en": "2026", "zh": "2026" },
+      "title": { "en": "Personal Site", "zh": "Personal Site 个人网站" },
+      "note": {
+        "en": "That's this site～",
+        "zh": "就是本站哦～"
+      },
+      "url": "https://susie-meow.github.io/personal-blog"
+    }
+  ],
+  "footnote": {
+    "en": [
+      { "text": "Recently, I've noticed that some individuals have been using my work without authorization. Please stay vigilant and do not trust such content, to avoid any financial loss. If you come across any such situations, you can report them to me through the following channel: " },
+      { "text": "PRESS HERE", "url": "https://susie-meow.github.io/personal-blog/#works" },
+      { "text": " ,I'd really appreciate it. Copyright © Susie Meow. All rights reserved." }
+    ],
+    "zh": [
+      { "text": "近期发现有人未经授权擅自盗用本人作品。敬请各位提高警惕，切勿轻信，以免造成经济损失。如遇相关情况，可通过以下方式向本人举报：" },
+      { "text": "点击这里",
+        "url": "https://susie-meow.github.io/personal-blog/#works" },
+      { "text": "，感激不尽。版权所有 © Susie Meow。保留所有权利。" }
+    ]
+  }
+}

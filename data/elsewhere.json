@@ -1,0 +1,59 @@
+{
+  "_comment": "在别处找我的板块：标题、导语、链接条目列表、页脚说明。meta 是右侧那列小字（比如账号 UID），可以留空字符串。url 留空则这一条不可点击。",
+  "heading": { "en": "Where else to find me.", "zh": "在别处找到我。" },
+  "lede": {
+    "en": "Same me everywhere～",
+    "zh": "都在这里啦～"
+  },
+  "items": [
+    {
+      "title": { "en": "Bilibili — 澄闪大猫猫", "zh": "B 站 —— 澄闪大猫猫" },
+      "note": {
+        "en": "All videos will be posted here.",
+        "zh": "所有视频都会发到这里哦。"
+      },
+      "meta": "UID 458056589",
+      "url": "https://space.bilibili.com/458056589"
+    },
+    {
+      "title": { "en": "YouTube — GoldenglowCatto", "zh": "YouTube —— GoldenglowCatto" },
+      "note": {
+        "en": "This channel has been running since April 2020.",
+        "zh": "这个账号在 2020 年 4 月注册。"
+      },
+      "meta": "@goldenglowcatto",
+      "url": "https://www.youtube.com/@goldenglowcatto"
+    },
+    {
+      "title": { "en": "GitHub — Susie Meow", "zh": "GitHub —— Susie Meow" },
+      "note": {
+        "en": "Where I keep my code. If you like it, please give me a Star 🥹.",
+        "zh": "放代码的地方，喜欢请点个 Star 喵，求你了喵🥹。"
+      },
+      "meta": "Susie-Meow",
+      "url": "https://github.com/Susie-Meow"
+    },
+    {
+      "title": { "en": "抖音 Douyin", "zh": "抖音 Douyin" },
+      "note": {
+        "en": "The view counts here are really high (even though there's no creative income 😢).",
+        "zh": "这里播放量好高欸（虽然没收入😢）。"
+      },
+      "meta": { "en": "hyacinewww", "zh": "hyacinewww" },
+      "url": "https://v.douyin.com/pN9yH7xQEcA/"
+    },
+    {
+      "title": { "en": "Email", "zh": "邮箱" },
+      "note": {
+        "en": "If there's anything urgent, you can reach me by email.",
+        "zh": "有急事可以透过邮箱联系我。"
+      },
+      "meta": { "en": "2026483959@qq.com", "zh": "2026483959@qq.com" },
+      "url": ""
+    }
+  ],
+  "footnote": {
+    "en": " The contact information above is for communication about relevant content only. Please do not use it for advertising, marketing harassment, or any unauthorized purposes. Thank you for your cooperation. Copyright © Susie Meow. All rights reserved.",
+    "zh": "以上联系方式仅供交流相关内容使用，请勿用于广告推广、营销骚扰或任何未经授权的用途。多谢合作。版权所有 © Susie Meow。保留所有权利。"
+  }
+}

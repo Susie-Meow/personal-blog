@@ -1,0 +1,201 @@
+{
+  "_comment": "一篇文章。放在 data/posts/ 里，文件名就是它的 slug —— 这个文件叫 how-this-site-was-built.json，网址就是 #post/how-this-site-was-built。body 里每个块只写一个键，键名决定渲染成什么元素：p 段落 / h2 h3 小标题 / ul ol 列表 / quote 引言 / code 代码块 / img 图片。文字可以写普通字符串，也可以写 { \"en\": …, \"zh\": … } 双语对象；想在句子里插链接、行内代码或加粗，就写成 [{ \"text\": \"…\" }, { \"text\": \"…\", \"url\": \"…\" }, { \"text\": \"…\", \"code\": true }, { \"text\": \"…\", \"strong\": true }] 这种小块。",
+  "title": {
+    "en": "How this site is built",
+    "zh": "这个站是怎么搭出来的"
+  },
+  "date": "2026-09-30",
+  "body": [
+    { "h2": { "en": "The idea", "zh": "思路" } },
+    {
+      "p": {
+        "en": "There is nothing very complicated about this site. No framework, no build step, no server. Basically a few HTML, CSS, JavaScript and JSON files.",
+        "zh": "这个网站其实没什么特别复杂的东西。没有框架，没有构建步骤，也没有服务器。基本就是几个 HTML、CSS、JavaScript 和 JSON。"
+      }
+    },
+    {
+      "p": {
+        "en": "The requirement was simple enough anyway: one page that puts the videos I've made, a couple of small tools, and the links I actually use in one place. For something that small I really didn't want to build another whole complicated thing around it (and honestly, my skills are limited 😌) — and above all I didn't want to be looking after it forever afterwards.",
+        "zh": "总之需求非常简单，无非是弄个页面把我做过的视频、几个小工具，还有平时会用到的一些链接放在一起。就这么点需求，我实在不太想再搞一套很复杂的东西出来（当然实力也确实有限😌），尤其是不想做完以后还得一直伺候它。"
+      }
+    },
+
+    { "h2": { "en": "Good news for the lazy", "zh": "懒人福音" } },
+    {
+      "p": {
+        "en": [
+          { "text": "Let's start with the most obvious bit. There isn't even a " },
+          { "text": "package.json", "code": true },
+          { "text": " in this repository, and no " },
+          { "text": "node_modules", "code": true },
+          { "text": " either. No build command, no build pipeline, none of that. The site is HTML, CSS and plain JavaScript." }
+        ],
+        "zh": [
+          { "text": "先说最明显的。这个仓库里连 " },
+          { "text": "package.json", "code": true },
+          { "text": " 都没有，" },
+          { "text": "node_modules", "code": true },
+          { "text": " 也没有。什么 build command、构建流程之类的，同样没有。网站就是 HTML、CSS 和原生 JavaScript。" }
+        ]
+      }
+    },
+    {
+      "p": {
+        "en": "I didn't even chase “modern” JavaScript here. If it works, it works, and writing it the simpler way is fine by me. Not that frameworks are bad — React and Vue all have their uses. I just think they'd be overkill here.",
+        "zh": "JavaScript 这里我甚至没有刻意追求什么“现代写法”。能用就行，写起来简单一点也挺好的。当然，我不是说框架不好。React、Vue 这些东西都有自己的用处，只是我觉得放在这里有点大材小用了。"
+      }
+    },
+    {
+      "p": {
+        "en": "This is one person's homepage, not a project maintained by hundreds of people. There are only a few pages and not much code, and setting up a full front-end toolchain for it would, I think, be more trouble than it's worth. The upside is that I edit a file, refresh, and the change is there — nothing in the middle to worry about.",
+        "zh": "这是一个人的主页，又不是几百个人一起维护的大项目。页面就这么几个，代码也没多少，真要为了它上完整的前端工程化，我反而觉得有点折腾。而且优势是改完文件刷新一下基本就能看到结果，中间没什么东西需要操心。"
+      }
+    },
+    {
+      "p": {
+        "en": "And if the site ever does grow big — well, I'll deal with it then. Which I don't think will happen (I'm very clear-eyed about my own skill level 😑).",
+        "zh": "当然，以后如果这个网站真的越做越大，那到时候再说，我觉得应该不会发生（对自身水平十分有数😑）。"
+      }
+    },
+
+    { "h2": { "en": "JSON", "zh": "JSON" } },
+    {
+      "p": {
+        "en": [
+          { "text": "The text and content on the site all live in the " },
+          { "text": "data/", "code": true },
+          { "text": " folder. " },
+          { "text": "index.html", "code": true },
+          { "text": " is mainly responsible for the page's own structure and styling; the JavaScript reads those JSON files in and renders them. A post, for example, is one JSON file, and the file name is its slug in the URL." }
+        ],
+        "zh": [
+          { "text": "网站上的文字和一些内容都放在 " },
+          { "text": "data/", "code": true },
+          { "text": " 文件夹里。" },
+          { "text": "index.html", "code": true },
+          { "text": " 主要负责页面本身的结构和样式，JavaScript 再把这些 JSON 读进来，最后显示出来。比如文章就是一个 JSON 文件，文件名就是它的网址 slug。" }
+        ]
+      }
+    },
+    {
+      "p": {
+        "en": [
+          { "text": "The most direct benefit of this is that " },
+          { "text": "changing content is easy.", "strong": true },
+          { "text": " Say I notice a line on the home page reads badly, or I want to add a card — I open the GitHub web page, edit it, commit, done. I don't even have to open a code editor." }
+        ],
+        "zh": [
+          { "text": "这么做最直接的好处就是：" },
+          { "text": "改内容很方便。", "strong": true },
+          { "text": "比如我突然发现首页上的一句话写得不太对，或者想加一张卡片，打开 GitHub 网页，改一下，提交，完事。甚至都不用打开代码编辑器。" }
+        ]
+      }
+    },
+    {
+      "p": {
+        "en": "I don't maintain this site every day, so that matters to me. When I remember a month later that “oh, this bit should probably be changed”, I'd rather just change it than open up a whole development environment again.",
+        "zh": "我平时也不是天天维护这个网站，所以这种事情对我来说还挺重要的。隔了一个月突然想起来“诶，这里好像该改一下”，最好就是随手改掉，而不是重新打开整个开发环境。"
+      }
+    },
+    {
+      "p": {
+        "en": "That said, it isn't a solution to everything. It suits the case where “the content changed, but it's still the same page”. If I ever want to redesign the whole site, or add a completely different kind of content, then it's back to editing the HTML and the JavaScript. JSON can't help me there — when code is needed, code has to be written.",
+        "zh": "不过这个办法也不是万能的。它比较适合“内容变了，但页面还是原来的页面”。如果我哪天突然想把整个网站重新设计一遍，或者想增加一种完全不同的内容，那还是得改 HTML 和 JavaScript。这时候 JSON 就帮不上什么忙了，该写代码还是得写代码。"
+      }
+    },
+
+    { "h2": { "en": "Keeping the video up to date", "zh": "视频推送刷新" } },
+    {
+      "p": {
+        "en": "The video part was a little more annoying. I originally wanted the home page to show my latest video by itself — the basic idea being that the page requests YouTube's feed directly and pulls the newest item out of it. The Same-Origin Policy, obviously, doesn't allow that.",
+        "zh": "视频推送稍微麻烦点，我本来想让首页自己显示最新的视频，基本逻辑是页面直接请求 YouTube 的 feed，然后拿最新的视频出来，但 Same-Origin Policy 显然不允许。"
+      }
+    },
+    {
+      "p": {
+        "en": "YouTube's feed doesn't send the right CORS headers, so even though the browser receives the data, it won't let the JavaScript on my page read it. Fine. If the browser won't allow it, then the browser shouldn't be the one asking.",
+        "zh": "YouTube 那边的 feed 没有合适的 CORS 响应头，所以浏览器拿到了数据，也不肯让我页面里的 JavaScript 读取。行吧。既然浏览器不让，那就别让浏览器请求了。"
+      }
+    },
+    {
+      "p": {
+        "en": "So in the end I moved the job into GitHub Actions. It runs roughly every six hours, checks whether YouTube has a new video, and if it does, writes the title, the link and the cover image into a file in the repository.",
+        "zh": "最后我把这件事放到了 GitHub Actions 里。现在大概每六个小时跑一次，它会去检查 YouTube 有没有新视频，有的话就把标题、链接、封面这些东西写进仓库里的文件。"
+      }
+    },
+    {
+      "p": {
+        "en": "Then the page only has to read that file. Which means that when someone opens the site, they never actually visit YouTube or Bilibili at all — the browser only ever requests files from this site.",
+        "zh": "然后网页只需要读取这个文件。这样一来，用户打开网站的时候，其实根本不用访问 YouTube 或 Bilibili，浏览器只请求这个网站自己的文件。"
+      }
+    },
+    {
+      "p": {
+        "en": "There's no analytics loaded either, incidentally. Not that analytics tools are somehow bad — I just didn't feel the need. Having people show up is nice; nobody showing up is fine too. I'm not running some huge site (mostly because nobody reads it anyway 😅).",
+        "zh": "顺便也没有加载什么 analytics。这个倒不是说统计工具有多坏，主要是我自己没觉得有这个必要。有人来看当然是好事，没人看…那也无所谓，我又不是在运营什么大型网站（主要是本来也没人看😅）。"
+      }
+    },
+    {
+      "p": {
+        "en": "As for the six-hour delay, I can live with it perfectly well. A video turning up on the home page a few hours late doesn't seem like a big deal. So for now the arrangement just carries on as it is.",
+        "zh": "至于六小时的延迟，我觉得也完全能接受。视频晚几个小时出现在首页，好像也不是什么大事。所以目前这个方案就这么凑合用了。"
+      }
+    },
+
+    { "h2": { "en": "What it doesn't do", "zh": "缺陷" } },
+    {
+      "p": {
+        "en": "Doing it this way definitely isn't perfect.",
+        "zh": "这么搞肯定不是十全十美。"
+      }
+    },
+    {
+      "p": {
+        "en": "First, long articles are a bit of a pain to write. This structure is fine for short pieces, project notes and that sort of thing. If I ever had to write a five-thousand-word essay… that would probably be fine too, actually. Hand it to an AI and go to bed happy 😁.",
+        "zh": "首先，长文章写起来有点麻烦。现在这种结构拿来写一些短文章、项目介绍之类的东西还行。如果哪天真让我写一篇五千字的长文…好像也还行，直接扔给 AI 然后美美睡觉😁。"
+      }
+    },
+    {
+      "p": {
+        "en": "Second, because the whole site runs on the client, a lot of things simply aren't there: no search, no comments, no analytics. I wasn't planning to build them anyway. My site, my rules (scheming face.jpg).",
+        "zh": "其次，因为整个网站都是客户端运行的，所以很多东西天然就没有。比如搜索、评论、统计之类的，目前都没有。当然我本来也不打算做，一言堂这一块（腹黑.jpg）。"
+      }
+    },
+    {
+      "p": {
+        "en": "The other issue is that the renderer is hand-written. Which means that if I ever want to add a new kind of content — a new component, say — I'll probably have to build it myself qwq, rather than installing something and being done with it the way you would with an off-the-shelf framework or content system. Not a big problem at the moment, though. It's my site, there isn't much in it, and I don't mind writing a bit of code now and then — or letting the AI drive.",
+        "zh": "还有一个问题就是，渲染器是自己写的。这意味着以后如果我想加一种新的内容类型，比如突然想搞个新的组件大概还是要手搓qwq，不像用了现成框架或者内容系统，可能装个东西就解决了。不过目前问题不大。这个网站毕竟是我自己的，东西也不多，偶尔自己写一点代码，或者 AI 启动，我觉得也还能接受。"
+      }
+    },
+
+    { "h2": { "en": "Was the design sensible", "zh": "设计合理性" } },
+    {
+      "p": {
+        "en": "For this site at least, I think it's fine. It's at minimum suitably low-maintenance: no dependencies to update, no server to look after, no background process running that will one day send me an enormous bill. I mostly don't have to touch it. Every so often I remember it exists and change something.",
+        "zh": "至少对这个网站来说我觉得还行，起码足够省心，没什么依赖要更新，没什么服务器需要维护，也没有什么后台程序一直运行，过一阵子再给我发个巨额账单。平时基本不用管它。偶尔想起来就改一下。"
+      }
+    },
+    {
+      "p": {
+        "en": "The most common way a personal project goes, I think, is that you start out enthusiastic and want to add everything. A few months later the project is still sitting in the repository gathering dust, and you've already decided you can't be bothered maintaining it. So this time I deliberately kept things small (not because I'm bad at this 😾), which also makes it easy for a beginner to fork and set up.",
+        "zh": "我觉得个人项目最容易出现的一种情况就是刚开始兴致勃勃，什么都想加。过几个月以后项目还在仓库里吃灰，但自己已经嫌麻烦懒得维护了。所以这次反而有意把东西做得简单一点（才不是菜😾），新手 fork 下来配置也方便。"
+      }
+    },
+    {
+      "p": {
+        "en": "If you want to build a personal site along the same lines, I'd say start with the plainest HTML, CSS and JavaScript. Don't load up a whole tech stack on day one — deal with problems when you actually run into them.",
+        "zh": "如果你也想做一个差不多的个人网站，其实我觉得可以先从最普通的 HTML、CSS、JavaScript 开始。不用一上来就把技术栈堆满，真的遇到问题了再想办法。"
+      }
+    },
+    {
+      "p": {
+        "en": "And if you ever reach the point of thinking “I think I do need that framework after all”, you can add it then. It's entirely possible you never will.",
+        "zh": "哪天真的觉得“这个框架我好像需要”那再加也不迟。当然也可能一直都不需要。"
+      }
+    }
+  ],
+  "footnote": {
+    "en": "The whole thing is open source and MIT licensed — the link is on the home page.",
+    "zh": "整个项目已经开源，用的是 MIT 许可 —— 链接在首页。"
+  }
+}
