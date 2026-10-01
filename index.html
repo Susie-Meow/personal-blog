@@ -177,9 +177,9 @@ a{ color:inherit; }
   border-bottom:1px solid transparent;
   transition:color .16s ease, border-color .16s ease;
 }
-.lang button:first-child::after{
-  content:"/"; margin:0 .5rem; color:var(--rule);
-}
+/* the slash between two languages, and its breathing room. Kept out of the
+   buttons so the active-language rule below can hug the word itself. */
+.lang-sep{ margin:0 .5rem; color:var(--rule); }
 .lang button:hover{ color:var(--ink); }
 .lang button[aria-pressed="true"]{
   color:var(--ink); font-weight:600;
@@ -235,6 +235,13 @@ p{
   overflow-wrap:break-word;
 }
 p:last-child{ margin-bottom:0; }
+
+/* A blank line inside a paragraph (`\n\n` in the JSON) — a wider break than a plain
+   newline, which is just the line box's own leading (~9.7px at the body sizes). This
+   adds 0.6rem on top of that, landing at ~19px end to end: about the weight of the
+   1.15rem paragraph rhythm. Deliberate — inside one paragraph, a blank line should read
+   as heavily as a new paragraph, without actually splitting the text in two. */
+.line-gap{ display:block; height:.6rem; }
 
 .section-title{
   margin:3rem 0 1rem;
@@ -615,19 +622,28 @@ function localized(value, lang) {
   return String(value);
 }
 
-/* rich parts: [ { text }, { text, url }, { text, code }, { text, strong } ] -> escaped html */
+/* rich parts: [ { text }, { text, url }, { text, code }, { text, strong } ] -> escaped html
+   A newline becomes <br>, so one paragraph can hold a short stack of lines (a list of
+   handles, say) without needing a block type for it. A blank line becomes a wider gap
+   (.line-gap), so the same paragraph can still set its lead-in and closing line apart
+   from the list in the middle. */
+function withBreaks(html) {
+  return html.replace(/\n[ \t]*\n/g, '<span class="line-gap"></span>')
+             .replace(/\n/g, '<br>');
+}
+
 function rich(value) {
   if (Array.isArray(value)) {
     return value.map(function (part) {
       if (!part) { return ''; }
-      var text = esc(part.text === undefined ? '' : part.text);
+      var text = withBreaks(esc(part.text === undefined ? '' : part.text));
       if (part.url) { return '<a class="link" href="' + esc(part.url) + '">' + text + '</a>'; }
       if (part.code) { return '<code>' + text + '</code>'; }
       if (part.strong) { return '<strong>' + text + '</strong>'; }
       return text;
     }).join('');
   }
-  return esc(value === undefined || value === null ? '' : value);
+  return withBreaks(esc(value === undefined || value === null ? '' : value));
 }
 
 function field(value) { return rich(localized(value, state.lang)); }
@@ -686,10 +702,14 @@ function renderRail() {
   }).join('');
 
   /* language switch */
+  /* language switch — the slash is its own element, not a ::after on the button:
+     the active language is marked with a border-bottom, and a pseudo-element would
+     drag that rule out under the slash and its margins too. */
   var group = document.getElementById('langSwitch');
   group.setAttribute('aria-label', plain(state.site.languageGroupLabel));
-  group.innerHTML = (state.site.languages || []).map(function (lang) {
-    return '<button type="button" data-lang="' + esc(lang.code) + '" aria-pressed="' +
+  group.innerHTML = (state.site.languages || []).map(function (lang, i) {
+    return (i ? '<span class="lang-sep" aria-hidden="true">/</span>' : '') +
+           '<button type="button" data-lang="' + esc(lang.code) + '" aria-pressed="' +
            (lang.code === state.lang ? 'true' : 'false') + '">' + esc(lang.label) + '</button>';
   }).join('');
   Array.prototype.forEach.call(group.querySelectorAll('button'), function (b) {

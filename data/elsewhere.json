@@ -43,6 +43,15 @@
       "url": "https://v.douyin.com/pN9yH7xQEcA/"
     },
     {
+      "title": { "en": "Xiaohongshu — 澄闪猫猫", "zh": "小红书 —— 澄闪猫猫" },
+      "note": {
+        "en": "Where I post photos and short notes.",
+        "zh": "图文内容会发在这里。"
+      },
+      "meta": "subaru_desu",
+      "url": "https://xhslink.cn/o/1eBuHLeHcQu"
+    },
+    {
       "title": { "en": "Email", "zh": "邮箱" },
       "note": {
         "en": "If there's anything urgent, you can reach me by email.",
@@ -53,7 +62,7 @@
     }
   ],
   "footnote": {
-    "en": " The contact information above is for communication about relevant content only. Please do not use it for advertising, marketing harassment, or any unauthorized purposes. Thank you for your cooperation. Copyright © Susie Meow. All rights reserved.",
+    "en": "The contact information above is for communication about relevant content only. Please do not use it for advertising, marketing harassment, or any unauthorized purposes. Thank you for your cooperation. Copyright © Susie Meow. All rights reserved.",
     "zh": "以上联系方式仅供交流相关内容使用，请勿用于广告推广、营销骚扰或任何未经授权的用途。多谢合作。版权所有 © Susie Meow。保留所有权利。"
   }
 }

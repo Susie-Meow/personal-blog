@@ -10,17 +10,17 @@
   },
   "paragraphs": [
     {
-      "en": "You might know me as 澄闪大猫猫 on Bilibili, 澄闪猫猫 on Douyin, or 澄閃大貓貓_GoldenglowCatto on YouTube. This page is where I keep all of it in one place.",
-      "zh": "你可能在 B 站见过我，名字是澄闪大猫猫；在抖音上叫澄闪猫猫；YouTube 上则叫澄閃大貓貓_GoldenglowCatto。这里是我把各处内容收在一起的地方。"
+      "en": "You might have seen me on any of these:\n\nBilibili: 澄闪大猫猫\nDouyin: 澄闪猫猫 (Hyacinewww)\nXiaohongshu: 澄闪猫猫 (subaru_desu)\nYouTube: 澄閃大貓貓_GoldenglowCatto\n\nThis page is where I keep all of it in one place.",
+      "zh": "你可能在以下平台见过我：\n\nB 站：澄闪大猫猫\n抖音：澄闪猫猫（Hyacinewww）\n小红书：澄闪猫猫（subaru_desu）\nYouTube：澄閃大貓貓_GoldenglowCatto\n\n这里是我把各平台内容汇总在一起的地方。"
     },
     {
       "en": [
         { "text": "If you want to build a blog of your own, this project is open source on GitHub: " },
-        { "text": "https://susie-meow.github.io/personal-blog", "url": "https://susie-meow.github.io/personal-blog" }
+        { "text": "https://github.com/Susie-Meow/personal-blog", "url": "https://github.com/Susie-Meow/personal-blog" }
       ],
       "zh": [
         { "text": "如果你想自建 Blog，本项目已在 GitHub 开源：" },
-        { "text": "https://susie-meow.github.io/personal-blog", "url": "https://susie-meow.github.io/personal-blog" }
+        { "text": "https://github.com/Susie-Meow/personal-blog", "url": "https://github.com/Susie-Meow/personal-blog" }
       ]
     }
   ],
