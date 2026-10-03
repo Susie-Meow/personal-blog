@@ -28,10 +28,10 @@
     },
     {
       "id": "works",
-      "layout": "cards",
+      "layout": "timeline",
       "dataFile": "works.json",
-      "label": { "en": "Works", "zh": "作品" },
-      "title": { "en": "Works — Susie Meow", "zh": "作品 — Susie Meow" }
+      "label": { "en": "Works & achievements", "zh": "作品和成就" },
+      "title": { "en": "Works & achievements — Susie Meow", "zh": "作品和成就 — Susie Meow" }
     },
     {
       "id": "elsewhere",

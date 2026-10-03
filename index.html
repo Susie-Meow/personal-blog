@@ -44,7 +44,16 @@
   --tint:       rgba(255,46,126,.10);
 
   --sidebar-w: 300px;
-  --measure: 60ch;
+  /* One module, and it is the only width in the sheet: the column of type, the
+     width of every rule and every box in that column, and — doubled, with the
+     column gap between — the width of the sheet once it carries two columns.
+     A printed sheet has one column edge; a rule that stops short of the box it
+     introduces, or a list that runs wider than the paragraph above it, reads as
+     a mistake rather than as a measure. 42rem ≈ 73 characters of body text,
+     which is inside the <80 the brief allows and inside the column edge by
+     definition, because it is the column edge. */
+  --measure: 42rem;
+  --col-gap: clamp(2.25rem, 3.5vw, 4rem);
 
   --font: "Archivo", -apple-system, BlinkMacSystemFont, "Segoe UI",
           "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
@@ -208,8 +217,47 @@ a{ color:inherit; }
   padding:clamp(3rem, 8vh, 5.5rem) clamp(1.5rem, 5vw, 4.5rem) 6rem;
 }
 
-.panel{ max-width:var(--measure); display:none; }
-.panel.is-active{ display:block; }   /* a hard cut, not a fade-up */
+.panel{
+  /* the sheet is one column of --measure, and everything in it ends on that edge */
+  max-width:var(--measure); display:none;
+  /* The opacity the two phases hand over at. Faint enough to read as nothing, so
+     the swap happening underneath it cannot be seen — and not 0, so the content
+     column is never blank: the eye reads one continuous dip instead of a blink. */
+  --dip:.08;
+}
+.panel.is-active{ display:block; }
+
+/* Everything in the sheet ends on the column edge: paragraphs, headings, the
+   lede, the lists, the ledgers, the picture. The colophon is the one exception,
+   and only for its type — .79rem run the full column would be ninety-odd
+   characters to the line, so the small print is set to its own measure inside
+   the column. Padding rather than max-width, because the hairline above it is a
+   rule, and a rule belongs to the column rather than to the sentence under it. */
+.panel > .foot{ padding-right:calc(100% - 30rem); }
+
+/* Switching sheets — a short dissolve, and nothing else.
+   Printed matter does not slide, so the move is opacity only, in the same
+   .3s-ish band everything else on the page moves in. It is two phases rather
+   than a cross-dissolve because the panels sit in the normal flow (they are
+   different heights, so they have to) and their words lie straight on the paper:
+   fading one into the other would double-expose two sets of text. So the sheet
+   on screen dims first, and the incoming one is printed in its place — the two
+   meet at --dip, where neither sheet is legible and neither is missing.
+   The two easings are a pair: the out settles into the dip, the in leaves it at
+   once and eases off — so the handover is invisible and the move reads as one
+   dip rather than a blink. Both curves were picked by walking them frame by
+   frame at 60 Hz: the largest single-frame change is 0.2 either way, and the
+   step across the swap is 0.002 (the dip itself, 0.08, is the one value both
+   curves share).
+   Only a real change of sheet animates: the first paint and a language re-render
+   arrive instantly, because neither of them is a jump.
+   The out duration is mirrored by LEAVE_MS in the script below — change both
+   together. The enter class takes itself off on animationend, so its duration
+   lives here only. */
+.panel.is-leaving{ animation:panel-out .12s cubic-bezier(.35, 0, .65, 1) both; }
+.panel.is-entering{ animation:panel-in .16s cubic-bezier(0, 0, .58, 1) both; }
+@keyframes panel-out{ from{ opacity:1; } to{ opacity:var(--dip); } }
+@keyframes panel-in{ from{ opacity:var(--dip); } to{ opacity:1; } }
 
 h1,h2,h3{ margin:0; font-weight:700; letter-spacing:-.02em; line-height:1.3; }
 
@@ -218,7 +266,8 @@ h1,h2,h3{ margin:0; font-weight:700; letter-spacing:-.02em; line-height:1.3; }
   font-size:clamp(1.95rem, 4.1vw, 2.85rem);
   line-height:1.12;
   font-variation-settings:"wdth" 92;
-  max-width:26ch;
+  /* no measure of its own: the heading is the sheet's line, so it runs the sheet
+     and breaks where the sheet breaks — never a few characters short of it */
   text-wrap:balance;
 }
 
@@ -227,11 +276,12 @@ h1,h2,h3{ margin:0; font-weight:700; letter-spacing:-.02em; line-height:1.3; }
   font-size:1.08rem;
   line-height:1.7;
   color:var(--ink-2);
-  max-width:48ch;   /* a little room so a long link in the intro never splits */
 }
 p{
   margin:0 0 1.15rem;
-  max-width:56ch;
+  /* the column above measures it now — a second ch limit here would only make the
+     paragraphs stop short of the column they were given */
+  max-width:none;
   overflow-wrap:break-word;
 }
 p:last-child{ margin-bottom:0; }
@@ -295,7 +345,8 @@ p:last-child{ margin-bottom:0; }
 }
 .video-more{ display:block; margin-top:.35rem; }
 
-/* rows: hairlines, and a marker underline where the pointer is */
+/* rows: hairlines, and a marker underline where the pointer is.
+   The hairlines run the column like every other rule on the sheet. */
 .rows{ list-style:none; margin:0; padding:0; }
 .rows > li{ border-bottom:1px solid var(--rule); }
 .rows > li:first-child{ border-top:1px solid var(--rule); }
@@ -326,7 +377,7 @@ p:last-child{ margin-bottom:0; }
 .row-note{
   margin:0;
   font-size:.89rem; line-height:1.62;
-  color:var(--ink-2); max-width:50ch;
+  color:var(--ink-2);
   overflow-wrap:break-word;
 }
 .row-meta{
@@ -353,41 +404,197 @@ p:last-child{ margin-bottom:0; }
 }
 .index dd{ margin:0; flex:1 1 auto; font-size:.94rem; overflow-wrap:break-word; }
 
-/* works: printed cards, ink border, no shadow */
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
-  gap:1rem;
-  margin:0;
+/* works & achievements: a dated rail. One printed rule down the middle, a spot
+   square for every entry, and the card hung off it on the right.
+   The date is set flush left, so the ledger stands on the same left edge as the
+   heading and the lede above it — every date in the data starts with the year,
+   so flush left keeps the years in their own column just as right-alignment did,
+   while the first thing the eye meets in a row is the sheet's own edge. */
+.timeline{
+  --t-date: 4rem;     /* the ledger column — as wide as the longest date the
+                         data actually carries (2026.10 ≈ 3.25rem) plus air, so
+                         a longer one still lands short of the rail */
+  --t-rail: 1.5rem;   /* the rail the spine runs down */
+  /* where the middle of a card's first line sits, measured down from the row's
+     top: the card's own top padding, plus half the title's line box
+     (1.1rem + 1.02rem × 1.4 ÷ 2). The date, the square and the pointer all hang
+     off this one number, so nothing drifts out of line when the card changes. */
+  --t-lead: 1.81rem;
+  position:relative;
+  list-style:none;
+  margin:0; padding:0;
 }
-.grid > article{
-  min-width:0;
-  padding:1.3rem;
+/* one continuous rule behind every row, so the segments can never seam */
+.timeline::before{
+  content:"";
+  position:absolute;
+  inset:0 auto 0 calc(var(--t-date) + var(--t-rail) / 2 - 1px);
+  width:2px;
+  background:var(--ink);
+}
+.tl-item{
+  display:grid;
+  grid-template-columns:var(--t-date) var(--t-rail) 1fr;
+  grid-template-areas:"date rail card";
+  align-items:start;
+  padding:0 0 1.4rem;
+}
+/* An entry the filter has ruled out. The row has to say so itself: `display:grid`
+   above outranks the browser's own [hidden] rule, so without this the entry
+   would stay on the sheet and the filter would look broken. */
+.tl-item[hidden]{ display:none; }
+
+.tl-date{
+  grid-area:date;
+  /* its own line box is .74rem × 1.68, so this lands its centre on --t-lead.
+     No side padding: the date's own left edge has to be the column's, or the
+     ledger stops lining up with the sheet's edge above it. */
+  padding:calc(var(--t-lead) - .62rem) 0 0;
+  text-align:left;
+  font-size:.74rem; font-weight:500;
+  font-variation-settings:"wdth" 112;
+  letter-spacing:.03em;
+  font-variant-numeric:tabular-nums;
+  color:var(--ink-2);
+}
+/* the tally light again, one size up and printed in the spot ink. It stays the
+   biggest mark on the rail — the pointer below is deliberately smaller, so the
+   colour reads as the anchor and the wedge as its tail. The ring is the stock
+   colour, so the spine is knocked out around it instead of bleeding into it —
+   the same trick as the portrait's offset plate, without the offset. */
+.tl-node{
+  grid-area:rail;
+  justify-self:center;
+  width:13px; height:13px;
+  margin-top:calc(var(--t-lead) - .41rem);   /* half of the square */
+  background:var(--spot);
+  box-shadow:0 0 0 3px var(--stock);
+}
+
+.tl-card{
+  grid-area:card;
+  position:relative;
+  /* small: the square sits in the middle of the 1.5rem rail, so the visible gap
+     between them is this plus half the rail */
+  margin-left:.15rem;
+  padding:1.1rem clamp(1rem, 2.2vw, 1.3rem);
   background:var(--sheet);
   border:1px solid var(--ink);
   transition:background .16s ease;
 }
-.grid > article:first-child{ border-top:3px solid var(--spot); }
-.grid > article:hover{ background:var(--sheet-hi); }
-.grid h3{
+.tl-card:hover{ background:var(--sheet-hi); }
+/* the pointer back to the rail: a hard ink wedge, same ink as the card's own
+   rule, sized to exactly span the gap between the square and the card's edge.
+   The extra 1px is the card's own border — `top` here is measured from its
+   padding box. */
+.tl-card::before{
+  content:"";
+  position:absolute; left:-8px; top:calc(var(--t-lead) - 6.5px);
+  width:9px; height:11px;
+  background:var(--ink);
+  clip-path:polygon(100% 0, 0 50%, 100% 100%);
+}
+.tl-head{ display:flex; flex-wrap:wrap; align-items:baseline; gap:.9rem; }
+.tl-title{
+  margin:0;
   font-size:1.02rem;
   font-variation-settings:"wdth" 96;
   line-height:1.4;
-  margin-bottom:.45rem;
 }
-.grid .year{
-  display:block;
-  margin-bottom:.75rem;
-  font-size:.74rem; font-weight:500;
+/* the type plate and the optional kind both hang on the far end of the title
+   line. Each carries margin-left:auto — the first one to claim it takes all the
+   free space and the other gets none — so either can sit there alone, and with
+   both they pair up on the right without needing a wrapper element. */
+.tl-kind{
+  margin-left:auto; flex:0 0 auto;
+  font-size:.72rem; font-weight:500;
   font-variation-settings:"wdth" 112;
   letter-spacing:.03em;
   color:var(--ink-2);
 }
-.grid p{
-  margin:0; max-width:none;
+.tl-note{
+  margin:.5rem 0 0;
   font-size:.89rem; line-height:1.62;
   color:var(--ink-2);
   overflow-wrap:break-word;
+}
+
+/* Narrow screens used to fold the ledger column up over the card, which put the
+   date's left edge wherever the rail happened to be — a second left edge for the
+   same page. The ledger now keeps its column at every width instead: a phone
+   pays for it in card width (about 180px at the narrowest), and the sheet keeps
+   the single left edge its heading, lede and dates all stand on. */
+
+/* The filter, on the line under the lede, and the tags, under the rail.
+   A control in this sheet is bare type with a small mark in front of it — the
+   nav does exactly this — while a box in this sheet is a surface that holds
+   something. So the filter is type and a tally light, and a tag is a plate.
+   A paper tag and a button therefore never look alike, which is the point:
+   the buttons above are pressed, the tags below are only the page's own filing. */
+.filter{
+  display:flex; flex-wrap:wrap; align-items:center;
+  gap:.9rem 1.6rem;
+  margin:0 0 1.9rem;
+}
+.filter-btn{
+  appearance:none; -webkit-appearance:none;
+  border:0; background:none; padding:0; margin:0;
+  display:flex; align-items:center; gap:.55rem;
+  font-family:inherit; font-size:.8rem; font-weight:500;
+  font-variation-settings:"wdth" 108;
+  letter-spacing:.02em;
+  color:var(--ink-2);
+  cursor:pointer;
+  transition:color .16s ease;
+}
+/* the tally light, one size down from the nav's and with the same two states:
+   an empty ring for a plain choice, spot ink for the one in force */
+.filter-btn::before{
+  content:"";
+  flex:0 0 auto;
+  width:9px; height:9px;
+  border:1px solid var(--rule-2);
+  transition:background .16s ease, border-color .16s ease;
+}
+.filter-btn:hover{ color:var(--ink); }
+.filter-btn:hover::before{ border-color:var(--ink); }
+.filter-btn[aria-pressed="true"]{ color:var(--ink); font-weight:600; }
+.filter-btn[aria-pressed="true"]::before{
+  background:var(--spot); border-color:var(--spot);
+}
+
+/* a tag is a small plate — the same plate on the entry and in the list below,
+   so the two read as one label seen twice rather than two different things */
+.tag,
+.tl-tag{
+  flex:0 0 auto;
+  padding:.08rem .42rem;
+  border:1px solid var(--rule-2);
+  font-size:.72rem; font-weight:500;
+  font-variation-settings:"wdth" 112;
+  letter-spacing:.03em;
+  line-height:1.35;
+  color:var(--ink-2);
+  white-space:nowrap;
+}
+.tl-tag{ margin-left:auto; }
+
+/* the page's own filing, under the rail and on the rail's left edge: the rule
+   above it is the sheet's heavy rule, the same one a section break uses */
+.taglist{
+  display:flex; flex-wrap:wrap; align-items:center;
+  gap:.5rem .5rem;
+  margin:1.6rem 0 0;      /* plus the last row's 1.4rem = the 3rem a section break takes */
+  padding:.85rem 0 0;
+  border-top:2px solid var(--ink);
+}
+.taglist-label{
+  flex:0 0 auto;
+  margin-right:.35rem;
+  font-size:.74rem; font-weight:600;
+  font-variation-settings:"wdth" 112;
+  letter-spacing:.03em;
+  color:var(--ink);
 }
 
 .foot{
@@ -395,7 +602,6 @@ p:last-child{ margin-bottom:0; }
   border-top:1px solid var(--rule);
   font-size:.79rem; line-height:1.65;
   color:var(--ink-2);
-  max-width:50ch;
 }
 
 /* a post: same column as the panels, one step narrower for long reading.
@@ -412,7 +618,8 @@ p:last-child{ margin-bottom:0; }
   color:var(--ink-2);
 }
 
-.prose{ max-width:56ch; }
+/* a post has no second column, so it reads as one sheet of type, measured by
+   .panel > .prose above like every other block of running text */
 /* a post with no lede: without this the date sits flush against the first block,
    because the first child's own top margin is zeroed just below */
 .post-meta + .prose{ margin-top:1.5rem; }
@@ -535,6 +742,51 @@ p:last-child{ margin-bottom:0; }
   .row{ flex-direction:column; align-items:flex-start; gap:.4rem; padding:1.1rem 0; }
 }
 
+/* ============================================================
+   WIDE SCREENS — the sheet takes a second column
+   Rail, then a sheet. Until here the sheet has been one column of
+   type, which on a 2560px screen left two thirds of the stock bare.
+   Past 106rem there is room to print it as two columns, the way a
+   broadside would: the reading column, and beside it the things that
+   are not reading — the picture, the rundown table, the list of posts.
+   A dated rail is the one list that cannot move over: it is read as a
+   single row of date, rule and card, so it stays in the reading column.
+   Both columns are the same module, so the sheet keeps one edge down
+   the middle and one down the right, and the heading — the sheet's
+   own line — runs the whole of it. 106rem is where the second column
+   comes out around 590px and grows to the full module by about
+   1850px; below it the split would squeeze a ledger under 500px, so
+   the sheet stays one column there, and the paper left over is a
+   margin, which a sheet is entitled to.
+   ============================================================ */
+@media (min-width: 106rem){
+  .panel.is-active{
+    display:grid;
+    grid-template-columns:minmax(0, var(--measure)) minmax(0, var(--measure));
+    column-gap:var(--col-gap);
+    align-content:start;
+    max-width:calc(var(--measure) * 2 + var(--col-gap));
+  }
+  /* the heading is the sheet's own line, not the column's */
+  .panel > .display{ grid-column:1 / -1; }
+  /* the reading column … */
+  .panel > .lede,
+  .panel > p,
+  .panel > .prose,
+  .panel > .section-title,
+  .panel > .filter,
+  .panel > .taglist,
+  .panel > .timeline{ grid-column:1; }
+  /* … and what sits beside it. The timeline is deliberately not in this list:
+     a dated rail is one continuous object — its date, its rule and its card are
+     a single row and cannot be split over two columns — so it keeps the first
+     column, which is also what puts the dates on the same left edge as the
+     heading and the lede they belong to. */
+  .panel > .video,
+  .panel > .index,
+  .panel > .rows{ grid-column:2; }
+}
+
 @media (prefers-reduced-motion: reduce){
   *{ animation:none !important; transition:none !important; }
 }
@@ -580,7 +832,7 @@ p:last-child{ margin-bottom:0; }
    data/profile.json    avatar, name, tagline, status line
    data/home.json       the Home panel
    data/blog.json       the Blog panel
-   data/works.json      the Works panel
+   data/works.json      the Works & achievements panel
    data/elsewhere.json  the Find me elsewhere panel
    data/posts/*.json    one file per post, fetched the first time it is opened
 
@@ -596,7 +848,11 @@ var state = {
   posts: {},    /* slug -> json, filled lazily by showPost() */
   live: null,   /* data/live.json — written by the scheduled sync, may be absent */
   lang: 'en',
-  current: ''   /* current route: a panel id, or "post/<slug>" */
+  current: '',  /* current route: a panel id, or "post/<slug>" */
+  /* which type the works rail is filtered to: '' is everything. Kept out here
+     rather than in the markup because a language switch rebuilds every panel
+     from scratch, and the reader's choice has to survive that. */
+  tag: ''
 };
 
 /* ---------- helpers ---------- */
@@ -830,17 +1086,90 @@ function renderRows(items) {
   }).join('') + '</ul>';
 }
 
-function renderCards(items) {
-  if (!items || !items.length) { return ''; }
-  return '<div class="grid">' + items.map(function (item) {
+/* The types a page actually carries, in the order the data first mentions them.
+   Read off the entries every time rather than kept as a list of its own: adding
+   a type to one entry is then all it takes for the filter above the rail and the
+   tags below it to pick it up, and no type can go stale in three places at once. */
+function tagSet(data) {
+  var map = (data && data.tagLabels) || {};
+  var seen = {}, out = [];
+  ((data && data.items) || []).forEach(function (item) {
+    var keys = (item && item.tags) || [];
+    if (typeof keys === 'string') { keys = [keys]; }
+    keys.forEach(function (key) {
+      if (seen[key]) { return; }
+      seen[key] = true;
+      /* an unknown key still shows, as itself, rather than vanishing silently */
+      out.push({ key: key, label: map[key] === undefined ? { en: key, zh: key } : map[key] });
+    });
+  });
+  return out;
+}
+
+/* the filter, on the line under the lede: one button per type the data carries,
+   and one way back to everything. Buttons rather than links, because which
+   entries are on screen is a state of this page and not a place to be sent to.
+   A single type is not a choice, so then there is no filter at all. */
+function renderFilter(data) {
+  var tags = tagSet(data);
+  if (tags.length < 2) { return ''; }
+  function button(key, label) {
+    return '<button type="button" class="filter-btn" data-tag="' + esc(key) + '"' +
+           ' aria-pressed="' + (key === state.tag ? 'true' : 'false') + '">' +
+           field(label) + '</button>';
+  }
+  var html = button('', { en: 'All', zh: '全部' });
+  tags.forEach(function (t) { html += button(t.key, t.label); });
+  return '<div class="filter" role="group" aria-label="' +
+         plain(data.filterLabel || 'Filter') + '">' + html + '</div>';
+}
+
+/* the tags the page is filed under, under the rail and on the rail's edge */
+function renderTagList(data) {
+  var tags = tagSet(data);
+  if (!tags.length) { return ''; }
+  return '<p class="taglist">' +
+           '<span class="taglist-label">' + field(data.tagsLabel || 'Tags') + '</span>' +
+           tags.map(function (t) { return '<span class="tag">' + field(t.label) + '</span>'; }).join('') +
+         '</p>';
+}
+
+/* works & achievements: a dated rail. Each entry is a dated point on one
+   continuous rule, with the card hung off it on the right. Newest first — the
+   data decides the order, this only draws it.
+
+   Two labels can ride on an entry, both at the far end of the title line and
+   neither of them invented here: `kind` is the hand-written word for whether an
+   entry is a work or an achievement, and `tags` are keys into data.tagLabels —
+   the same keys the filter and the tag list are built from, so an entry and the
+   page's own filing can never drift apart. */
+function renderTimeline(data) {
+  var items = (data && data.items) || [];
+  if (!items.length) { return ''; }
+  var map = (data && data.tagLabels) || {};
+  return '<ol class="timeline">' + items.map(function (item) {
     var title = field(item.title);
     if (item.url) { title = '<a class="link" href="' + esc(item.url) + '">' + title + '</a>'; }
-    return '<article>' +
-      (item.year ? '<span class="year">' + field(item.year) + '</span>' : '') +
-      '<h3>' + title + '</h3>' +
-      '<p>' + field(item.note) + '</p>' +
-    '</article>';
-  }).join('') + '</div>';
+    var keys = item.tags || [];
+    if (typeof keys === 'string') { keys = [keys]; }
+    var plates = keys.map(function (key) {
+      var label = map[key] === undefined ? { en: key, zh: key } : map[key];
+      return '<span class="tl-tag">' + field(label) + '</span>';
+    }).join('');
+    return '<li class="tl-item"' +
+      (keys.length ? ' data-tags="' + esc(keys.join(' ')) + '"' : '') + '>' +
+      '<span class="tl-date">' + field(item.date) + '</span>' +
+      '<span class="tl-node" aria-hidden="true"></span>' +
+      '<div class="tl-card">' +
+        '<div class="tl-head">' +
+          '<h3 class="tl-title">' + title + '</h3>' +
+          plates +
+          (item.kind ? '<span class="tl-kind">' + field(item.kind) + '</span>' : '') +
+        '</div>' +
+        '<p class="tl-note">' + field(item.note) + '</p>' +
+      '</div>' +
+    '</li>';
+  }).join('') + '</ol>';
 }
 
 /* ---------- posts ----------
@@ -923,10 +1252,18 @@ function renderPanels() {
     var heading = '<h1 class="display" id="' + esc(item.id) + '-title">' + field(data.heading) + '</h1>' +
                   '<p class="lede">' + field(data.lede) + '</p>';
 
+    /* one branch per layout in data/site.json — written out rather than
+       defaulted, so the set of layouts this file understands is greppable
+       (the data audit reads these names instead of keeping its own copy) */
     var body = '';
     if (item.layout === 'home') { body = renderHome(item.id, data); }
-    else if (item.layout === 'cards') { body = heading + renderCards(data.items); }
-    else { body = heading + renderRows(data.items); }
+    else if (item.layout === 'list') { body = heading + renderRows(data.items); }
+    else if (item.layout === 'timeline') {
+      /* filter, then the rail, then the tags the rail is filed under — the
+         control above the thing it rules, the legend below it */
+      body = heading + renderFilter(data) + renderTimeline(data) + renderTagList(data);
+    }
+    else { body = heading + renderRows(data.items); }   /* unknown: show the rows */
     if (data.footnote) { body += '<p class="foot">' + field(data.footnote) + '</p>'; }
 
     var section = document.createElement('section');
@@ -937,7 +1274,36 @@ function renderPanels() {
     section.hidden = true;
     main.appendChild(section);
   });
+
+  applyTagFilter();
 }
+
+/* ---------- the type filter ----------
+   Which entries are on screen is written onto the rows themselves, and the
+   buttons are re-stamped to match, so the markup is always the whole truth:
+   a screen reader, the print stylesheet and the next language switch all see
+   the filtered state rather than having to ask this script for it. */
+function applyTagFilter() {
+  Array.prototype.forEach.call(document.querySelectorAll('#main > .panel'), function (panel) {
+    Array.prototype.forEach.call(panel.querySelectorAll('.tl-item'), function (li) {
+      var keys = (li.getAttribute('data-tags') || '').split(' ');
+      li.hidden = !!state.tag && keys.indexOf(state.tag) < 0;
+    });
+    Array.prototype.forEach.call(panel.querySelectorAll('.filter-btn'), function (b) {
+      b.setAttribute('aria-pressed', b.getAttribute('data-tag') === state.tag ? 'true' : 'false');
+    });
+  });
+}
+
+/* one listener for every filter on the sheet rather than one per button: the
+   panels are rebuilt on a language switch, and listeners bound to them would be
+   swept away with the markup they were bound to */
+document.addEventListener('click', function (e) {
+  var btn = e.target && e.target.closest ? e.target.closest('.filter-btn') : null;
+  if (!btn) { return; }
+  state.tag = btn.getAttribute('data-tag') || '';
+  applyTagFilter();
+});
 
 /* ---------- section switching ---------- */
 function highlightNav(navId) {
@@ -947,16 +1313,114 @@ function highlightNav(navId) {
   });
 }
 
-/* one place decides what is on screen, so a post and a panel cannot both show */
-function revealPanel(section, navId) {
-  Array.prototype.forEach.call(document.querySelectorAll('#main > .panel'), function (p) {
-    var on = (p === section);
+/* ---------- what is on screen ----------
+   A change of sheet is a two-step move: the sheet on screen dims, and the
+   incoming one is printed in its place. Two steps rather than a cross-dissolve
+   because the panels sit in the normal flow (they are different heights, so they
+   have to) and their words lie straight on the paper — fading one into the other
+   would double-expose two sets of text. The two steps meet at --dip, where
+   neither sheet is legible and neither is missing, so the handover is invisible
+   and the whole move reads as one continuous dip rather than a blink.
+
+   Three cases go straight to the last step, because none of them is a jump:
+   the first paint; a language re-render, which rebuilds every panel and so
+   leaves nothing on screen marked active; and a reader who has asked the system
+   for less motion. The out duration is mirrored by .panel.is-leaving in the
+   stylesheet — change both together. */
+var LEAVE_MS = 120;
+var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+var leaveTimer = null;    /* the handoff queued behind a sheet that is lifting off */
+var pendingShow = null;   /* {sheet, write} waiting on that handoff */
+
+function canAnimate() { return !reducedMotion.matches; }
+
+function mainPanels() {
+  return Array.prototype.slice.call(document.querySelectorAll('#main > .panel'));
+}
+
+/* the one sheet currently on screen, if any */
+function sheetOnScreen() {
+  var found = null;
+  mainPanels().forEach(function (p) {
+    if (p.classList.contains('is-active')) { found = p; }
+  });
+  return found;
+}
+
+/* whatever was lifting off is not going anywhere any more */
+function forgetHandoff() {
+  pendingShow = null;
+  if (leaveTimer) { window.clearTimeout(leaveTimer); leaveTimer = null; }
+}
+
+/* put one sheet on screen and hide the rest, with no move at all */
+function showOnly(sheet) {
+  forgetHandoff();
+  mainPanels().forEach(function (p) {
+    p.classList.remove('is-leaving', 'is-entering');
+    var on = (p === sheet);
     p.classList.toggle('is-active', on);
     p.hidden = !on;
   });
+}
+
+/* One place decides what is on screen, so a post and a panel cannot both show.
+   `write`, when given, fills the sheet in — it is held back to the moment the
+   sheet is printed, which is what makes one post to the next a real move even
+   though both of them are the same element. */
+function revealPanel(sheet, navId, write) {
+  var onScreen = sheetOnScreen();
   highlightNav(navId);
   window.scrollTo(0, 0);
+
+  /* the same element simply re-read (a language re-render of one post) is not a
+     change of sheet either */
+  if (!canAnimate() || !onScreen || (onScreen === sheet && !write)) {
+    if (write) { write(); }
+    showOnly(sheet);
+    return;
+  }
+
+  /* a second click while the first sheet is still lifting off: re-aim, don't
+     restart, so the outgoing sheet never flashes back to full ink */
+  pendingShow = { sheet: sheet, write: write };
+  if (onScreen.classList.contains('is-leaving')) { return; }
+
+  onScreen.classList.remove('is-entering');
+  onScreen.classList.add('is-leaving');
+  onScreen.hidden = false;
+  leaveTimer = window.setTimeout(land, LEAVE_MS);
 }
+
+/* the incoming sheet takes the ink */
+function land() {
+  leaveTimer = null;
+  var job = pendingShow;
+  pendingShow = null;
+  /* the tree can be rebuilt underneath us (a language re-render) while we wait */
+  if (!job || !job.sheet.parentNode) { return; }
+
+  if (job.write) { job.write(); }
+
+  mainPanels().forEach(function (p) {
+    p.classList.remove('is-leaving');
+    var on = (p === job.sheet);
+    p.classList.toggle('is-active', on);
+    p.hidden = !on;
+  });
+
+  void job.sheet.offsetWidth;             /* flush the display change … */
+  job.sheet.classList.add('is-entering'); /* … so the ink rises from nothing */
+}
+
+/* The enter class takes itself off when its animation ends — one listener for
+   the whole page, so its duration is never mirrored in the script too. */
+document.addEventListener('animationend', function (e) {
+  var t = e.target;
+  if (t && t.classList && t.classList.contains('is-entering')) {
+    t.classList.remove('is-entering');
+  }
+});
 
 function showPanel(requested) {
   var panels = Array.prototype.slice.call(document.querySelectorAll('.panel'));
@@ -988,9 +1452,12 @@ function showPost(slug) {
       section.id = 'post-panel';
       main.appendChild(section);
     }
-    section.innerHTML = renderPost(post, owner);
-    revealPanel(section, owner);
+    var html = renderPost(post, owner);
     document.title = plain(post.title) + ' — ' + plain((state.profile || {}).name || '');
+    /* the markup is handed over rather than pasted in: when this post replaces
+       another in the very same element, the old words have to stay up until the
+       sheet has lifted off */
+    revealPanel(section, owner, function () { section.innerHTML = html; });
   };
 
   if (state.posts[slug]) { paint(state.posts[slug]); return; }

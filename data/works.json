@@ -1,14 +1,41 @@
 {
-  "_comment": "作品板块：标题、导语、卡片列表（items 里每加一组 { } 就多一张卡片）、页脚说明。year 可以是年份文字，也可以写“soon”。url 留空则标题不是链接。",
+  "_comment": "作品与成就板块：标题、导语、筛选与标签的文案、类型表、时间轴条目、页脚说明。date 是左侧那栏的日期文字（自由填写，例如 \"2026.10\"、\"2025\"、\"soon\"），最新的写在最前面。tags 是这一条属于哪一类，值必须是 tagLabels 里的键，可以写多个也可以留空；导语下面的筛选按钮与时间轴下面的标签，都是按 items 里**实际出现过**的类型自动生成的，不用在这里另外维护一份类型清单。kind 可选，用来标注这一条是作品还是成就。url 留空则标题不是链接。",
   "heading": { "en": "Things I've built.", "zh": "我做过的东西。" },
   "lede": {
     "en": "Mainly open-source projects on GitHub, and occasionally some other stuff.",
     "zh": "主要是 Github 的开源项目，偶尔会放点别的。"
   },
+  "filterLabel": { "en": "Filter by type", "zh": "按类型筛选" },
+  "tagsLabel": { "en": "Tags", "zh": "标签" },
+  "tagLabels": {
+    "open-source": { "en": "Open source", "zh": "开源项目" },
+    "video": { "en": "Video", "zh": "视频" }
+  },
   "items": [
     {
-      "year": "2026",
-      "title": { "en": "Card Design Generator", "zh": "Card Design Generator" },
+      "date": "2026.10",
+      "tags": ["open-source"],
+      "title": { "en": "Personal Site", "zh": "Personal Site 个人网站" },
+      "note": {
+        "en": "That's this site～A lightweight modern static blog · Minimal setup · Effortless customization · One-time config, forever done.",
+        "zh": "就是本站哦～轻量级现代化静态博客 · 极简配置 · 轻松个性化 · 一劳永逸。"
+      },
+      "url": "https://susie-meow.github.io/personal-blog"
+    },
+    {
+      "date": "2026.9",
+      "tags": ["video"],
+      "title": { "en": "Apple Wallet card face replacement tutorial video", "zh": "Apple 钱包卡面更换教程视频" },
+      "note": {
+        "en": "Total views across all platforms have reached 500,000.",
+        "zh": "全网播放量达500,000。"
+      },
+      "url": "https://www.bilibili.com/video/BV1Wehh6uEWv"
+    },
+    {
+      "date": "2026.9",
+      "tags": ["open-source"],
+      "title": { "en": "Card Design Generator (100+ Stars)", "zh": "Card Design Generator (100+ Stars)" },
       "note": {
         "en": "A pure front-end card face design generator for ISO 7810 ID-1 (85.60×53.98mm). Upload a background and logos, freely position/scale/rotate, add logo outlines, export 1536×969 PNG (~455 DPI). Bilingual.",
         "zh": "纯前端卡面设计生成器，按 ISO 7810 ID-1（85.60×53.98mm）制作卡面。上传底图与 logo，自由摆放、缩放、旋转，可为 logo 添加描边，导出 1536×969 PNG（约 455 DPI），中英双语。"
@@ -16,19 +43,20 @@
       "url": "https://github.com/Susie-Meow/card-design-generator"
     },
     {
-      "year": { "en": "2026", "zh": "2026" },
-      "title": { "en": "Personal Site", "zh": "Personal Site 个人网站" },
+      "date": "2026.9",
+      "tags": ["video"],
+      "title": { "en": "iPhone screen mirroring to Windows PC tutorial video", "zh": "iPhone 屏幕镜像至 Windows PC 教程视频" },
       "note": {
-        "en": "That's this site～",
-        "zh": "就是本站哦～"
+        "en": "Total views across all platforms have reached 400,000.",
+        "zh": "全网播放量达400,000。"
       },
-      "url": "https://susie-meow.github.io/personal-blog"
+      "url": "https://www.bilibili.com/video/BV1Kn4166ENJ"
     }
   ],
   "footnote": {
     "en": [
       { "text": "Recently, I've noticed that some individuals have been using my work without authorization. Please stay vigilant and do not trust such content, to avoid any financial loss. If you come across any such situations, you can report them to me through the following channel: " },
-      { "text": "PRESS HERE", "url": "https://susie-meow.github.io/personal-blog/#works" },
+      { "text": "PRESS HERE", "url": "https://susie-meow.github.io/personal-blog/#elsewhere" },
       { "text": " ,I'd really appreciate it. Copyright © Susie Meow. All rights reserved." }
     ],
     "zh": [
