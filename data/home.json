@@ -1,5 +1,5 @@
 {
-  "_comment": "主页内容：大标题、导语、正文段落、最新视频（自动同步，显示在 Lately 小节里）、Lately 表格、页脚说明。",
+  "_comment": "主页内容：大标题、导语、正文段落、最新视频（自动同步，显示在 Lately 小节里）、Lately 表格、页脚说明。正文第一段里那串平台名字是可点的（用富文本小块写成 [{text},{text,url}]），地址与 data/elsewhere.json 里对应的条目一致 —— 改一边记得改另一边。",
   "heading": {
     "en": "Hi, I'm Susie Meow. Nice to meet you!",
     "zh": "你好，我是 Susie Meow！"
@@ -10,8 +10,28 @@
   },
   "paragraphs": [
     {
-      "en": "You might have seen me on any of these:\n\nBilibili: 澄闪大猫猫\nDouyin: 澄闪猫猫 (Hyacinewww)\nXiaohongshu: 澄闪猫猫 (subaru_desu)\nYouTube: 澄閃大貓貓_GoldenglowCatto\n\nThis page is where I keep all of it in one place.",
-      "zh": "你可能在以下平台见过我：\n\nB 站：澄闪大猫猫\n抖音：澄闪猫猫（Hyacinewww）\n小红书：澄闪猫猫（subaru_desu）\nYouTube：澄閃大貓貓_GoldenglowCatto\n\n这里是我把各平台内容汇总在一起的地方。"
+      "en": [
+        { "text": "You might have seen me on any of these:\n\n-" },
+        { "text": "Bilibili: 澄闪大猫猫", "url": "https://space.bilibili.com/458056589" },
+        { "text": "\n-" },
+        { "text": "Douyin: 澄闪猫猫 (Hyacinewww)", "url": "https://v.douyin.com/pN9yH7xQEcA/" },
+        { "text": "\n-" },
+        { "text": "Xiaohongshu: 澄闪猫猫 (subaru_desu)", "url": "https://xhslink.cn/o/1eBuHLeHcQu" },
+        { "text": "\n-" },
+        { "text": "YouTube: 澄閃大貓貓 Susie Meow", "url": "https://www.youtube.com/@Susie-Meow" },
+        { "text": "\n\nThis page is where I keep all of it in one place." }
+      ],
+      "zh": [
+        { "text": "你可能在以下平台见过我：\n\n-" },
+        { "text": "哔哩哔哩（B 站）：澄闪大猫猫", "url": "https://space.bilibili.com/458056589" },
+        { "text": "\n-" },
+        { "text": "抖音：澄闪猫猫（Hyacinewww）", "url": "https://v.douyin.com/pN9yH7xQEcA/" },
+        { "text": "\n-" },
+        { "text": "小红书：澄闪猫猫（subaru_desu）", "url": "https://xhslink.cn/o/1eBuHLeHcQu" },
+        { "text": "\n-" },
+        { "text": "YouTube：澄閃大貓貓 Susie Meow", "url": "https://www.youtube.com/@Susie-Meow" },
+        { "text": "\n\n这里是我把各平台内容汇总在一起的地方。" }
+      ]
     },
     {
       "en": [

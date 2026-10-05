@@ -7,7 +7,7 @@
   },
   "items": [
     {
-      "title": { "en": "Bilibili — 澄闪大猫猫", "zh": "B 站 —— 澄闪大猫猫" },
+      "title": { "en": "Bilibili — 澄闪大猫猫", "zh": "哔哩哔哩（B 站） —— 澄闪大猫猫" },
       "note": {
         "en": "All videos will be posted here.",
         "zh": "所有视频都会发到这里哦。"
@@ -16,13 +16,13 @@
       "url": "https://space.bilibili.com/458056589"
     },
     {
-      "title": { "en": "YouTube — GoldenglowCatto", "zh": "YouTube —— GoldenglowCatto" },
+      "title": { "en": "YouTube — Susie Meow", "zh": "YouTube —— Susie Meow" },
       "note": {
         "en": "This channel has been running since April 2020.",
         "zh": "这个账号在 2020 年 4 月注册。"
       },
-      "meta": "@goldenglowcatto",
-      "url": "https://www.youtube.com/@goldenglowcatto"
+      "meta": "@Susie-Meow",
+      "url": "https://www.youtube.com/@Susie-Meow"
     },
     {
       "title": { "en": "GitHub — Susie Meow", "zh": "GitHub —— Susie Meow" },
@@ -34,7 +34,7 @@
       "url": "https://github.com/Susie-Meow"
     },
     {
-      "title": { "en": "抖音 Douyin", "zh": "抖音 Douyin" },
+      "title": { "en": "Douyin — 澄闪猫猫", "zh": "抖音 —— 澄闪猫猫" },
       "note": {
         "en": "The view counts here are really high (even though there's no creative income 😢).",
         "zh": "这里播放量好高欸（虽然没收入😢）。"
