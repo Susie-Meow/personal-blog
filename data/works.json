@@ -15,6 +15,16 @@
     {
       "date": "2026.10",
       "tags": ["open-source"],
+      "title": { "en": "[Minecraft Mod] ClickSign-CJK", "zh": "[Minecraft Mod] ClickSign-CJK" },
+      "note": {
+        "en": "A CJK fork of ClickSigns: working IME input and GNU Unifont glyphs, so road signs can take Chinese, Japanese and Korean.",
+        "zh": "ClickSigns 的中日韩（CJK）fork — 加入系统输入法（IME）与 GNU Unifont 字形，路牌可直接输入并显示中文、日文、韩文。"
+      },
+       "url": "https://github.com/Susie-Meow/ClickSigns-CJK"
+    },
+    {
+      "date": "2026.10",
+      "tags": ["open-source"],
       "title": { "en": "Personal Site", "zh": "Personal Site 个人网站" },
       "note": {
         "en": "That's this site～A lightweight modern static blog · Minimal setup · Effortless customization · One-time config, forever done.",
