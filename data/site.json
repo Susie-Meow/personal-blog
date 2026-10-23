@@ -6,6 +6,11 @@
     { "code": "zh", "label": "中文" }
   ],
   "languageGroupLabel": { "en": "Language", "zh": "语言" },
+  "themeToggle": {
+    "_note": "外观切换按钮的无障碍标签，说的是「按下去会发生什么」。图标显示的是目标状态：浅色时显示月亮。",
+    "toDark": { "en": "Switch to dark theme", "zh": "切换到深色模式" },
+    "toLight": { "en": "Switch to light theme", "zh": "切换到浅色模式" }
+  },
   "skipLink": { "en": "Skip to content", "zh": "跳到正文" },
   "metaDescription": {
     "en": "Susie Meow — Just feel free to look around.",

@@ -1,5 +1,5 @@
 {
-  "_comment": "在别处找我的板块：标题、导语、链接条目列表、页脚说明。meta 是右侧那列小字（比如账号 UID），可以留空字符串。url 留空则这一条不可点击。",
+  "_comment": "在别处找我的板块：标题、导语、链接条目列表、页脚说明。meta 是右侧那列小字（比如账号 UID），可以留空字符串。url 留空则这一条不可点击；邮箱这类没有网址的，url 写成 mailto:地址 照样能点。",
   "heading": { "en": "Where else to find me.", "zh": "在别处找到我。" },
   "lede": {
     "en": "Same me everywhere～",
@@ -58,7 +58,7 @@
         "zh": "有急事可以透过邮箱联系我。"
       },
       "meta": { "en": "2026483959@qq.com", "zh": "2026483959@qq.com" },
-      "url": ""
+      "url": "mailto:2026483959@qq.com"
     }
   ],
   "footnote": {

@@ -2,806 +2,1729 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Susie Meow</title>
 <meta id="metaDescription" name="description" content="" />
+<meta name="color-scheme" content="light dark" />
+<!-- one theme-color, rewritten by the script below: a media-dependent pair
+     would disagree with the reader the moment they override the system -->
+<meta id="themeColor" name="theme-color" content="#f5f5f7" />
 <!-- a real href from the start, so the browser never asks for /favicon.ico; JS swaps in profile.favicon once it loads -->
 <link id="favicon" rel="icon" href="assets/avatar-youtube.jpg" />
 
-<!-- One family, Archivo: its width axis carries the hierarchy, weight does the rest.
-     Noto Sans SC only carries the Chinese copy. -->
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+<!-- The platform face (SF Pro on Apple devices) instead of a downloaded one:
+     it ships with optical sizing and tracking, and it costs no request. -->
 
 <script>
-  /* set language before first paint so there is no flash of English */
+  /* Both of these are resolved before the first paint, so neither the language
+     nor the theme can flash its other state on load. The theme is a stored
+     choice first and the system preference second: once the reader has picked
+     one, the system is only a default they have already overruled. */
   try {
     var saved = localStorage.getItem('site-lang');
     if (saved === 'zh') { document.documentElement.lang = 'zh-CN'; }
   } catch (e) {}
+  (function () {
+    var chosen = '';
+    try { chosen = localStorage.getItem('site-theme') || ''; } catch (e) {}
+    /* anything that is not one of the two names is treated as "no choice", so a
+       stale or hand-edited value falls back to the system instead of pinning
+       the page to the wrong appearance */
+    if (chosen !== 'dark' && chosen !== 'light') { chosen = ''; }
+    var dark = chosen ? chosen === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    var meta = document.getElementById('themeColor');
+    if (meta) { meta.setAttribute('content', dark ? '#0b0b0d' : '#f5f5f7'); }
+  })();
 </script>
 
 <style>
 /* ============================================================
-   TOKENS
-   Print shop: one grey stock, one ink, one spot colour (the
-   magenta of her own avatar). Hierarchy comes from rule weight
-   and type width, never from shadows or gradients.
+   DESIGN TOKENS
+   One system for surfaces, type, spacing, radii and motion.
+   The canvas is a neutral Apple grey; hierarchy comes from type
+   and space. The single rose accent is drawn from the avatar and
+   is used sparingly: links, focus, selection and the active mark.
    ============================================================ */
 :root{
-  --stock:      #E9E8E2;   /* page: grey card stock */
-  --sheet:      #F5F4F0;   /* raised surface */
-  --sheet-hi:   #FBFAF7;
+  /* the light palette is the base. Dark is a peer declared below, never an
+     inversion: the canvas gets darker than the cards, not lighter. */
+  color-scheme: light;
 
-  --ink:        #191521;   /* deep plum-black, a real colour rather than a tinted black */
-  --ink-2:      #575264;   /* secondary text */
-  --rule:       #CBC9C1;   /* hairline */
-  --rule-2:     rgba(25,21,33,.22);
+  /* surfaces */
+  --bg:          #f5f5f7;
+  --surface:     #ffffff;
+  --surface-2:   #fbfbfd;
+  --material:    rgba(250, 250, 252, .72);
+  --nav-active:  #ffffff;
+  --segment:     #ffffff;
+  --fill:        rgba(118, 118, 128, .12);
+  --fill-hover:  rgba(118, 118, 128, .07);
+  --fill-active: rgba(118, 118, 128, .18);
 
-  --spot:       #FF2E7E;   /* the single spot ink */
-  --spot-text:  #B01250;   /* legible spot for running text */
-  --tint:       rgba(255,46,126,.10);
+  /* text — both greys clear 4.5:1 on the canvas */
+  --text:        #1d1d1f;
+  --text-2:      #5f5f64;
+  --text-3:      #6e6e73;
 
-  --sidebar-w: 300px;
-  /* One module, and it is the only width in the sheet: the column of type, the
-     width of every rule and every box in that column, and — doubled, with the
-     column gap between — the width of the sheet once it carries two columns.
-     A printed sheet has one column edge; a rule that stops short of the box it
-     introduces, or a list that runs wider than the paragraph above it, reads as
-     a mistake rather than as a measure. 42rem ≈ 73 characters of body text,
-     which is inside the <80 the brief allows and inside the column edge by
-     definition, because it is the column edge. */
-  --measure: 42rem;
-  --col-gap: clamp(2.25rem, 3.5vw, 4rem);
+  /* hairlines */
+  --line:        rgba(0, 0, 0, .08);
+  --line-strong: rgba(0, 0, 0, .16);
 
-  --font: "Archivo", -apple-system, BlinkMacSystemFont, "Segoe UI",
-          "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  /* the one accent */
+  --accent:       #c4005f;
+  --accent-hover: #a3004e;
+  --accent-soft:  rgba(196, 0, 95, .09);
+  --accent-soft-2:rgba(196, 0, 95, .16);
+  --accent-line:  rgba(196, 0, 95, .42);
+  --accent-glow:  rgba(196, 0, 95, .065);
+
+  /* depth — soft, never theatrical */
+  --shadow-sm:   0 1px 2px rgba(0, 0, 0, .05), 0 1px 1px rgba(0, 0, 0, .02);
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, .04), 0 10px 30px -16px rgba(0, 0, 0, .16);
+  --shadow-lift: 0 2px 6px rgba(0, 0, 0, .06), 0 18px 44px -18px rgba(0, 0, 0, .24);
+
+  /* radii */
+  --r-sm: .625rem;
+  --r-md: .875rem;
+  --r-lg: 1.125rem;
+  --r-pill: 999px;
+
+  /* layout */
+  --sidebar-w: 18rem;
+  --shell: 60rem;
+  --measure: 47.5rem;
+  --gutter: clamp(1.25rem, 4vw, 3.5rem);
+
+  /* type — the platform face, so optical sizing and tracking are free */
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+          "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+          "Noto Sans SC", sans-serif;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  /* a masked arrow, so it can take the current text colour in either theme */
+  --icon-external: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M3.5 8.5 8.5 3.5M4.5 3.5h4v4' fill='none' stroke='%23000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+
+  /* motion */
+  --dur-press: .1s;
+  --dur-fast: .16s;
+  --dur: .22s;
+  --dur-slow: .42s;
+  /* the palette cross-fade. Deliberately the shortest value in the set: see
+     the note on the swap rule for why a longer one is worse, not smoother. */
+  --dur-swap: .1s;
+  --ease-out: cubic-bezier(.22, .61, .36, 1);
+  --ease-in-out: cubic-bezier(.4, 0, .2, 1);
 }
 
+/* Dark is chosen in one place — the data-theme attribute — so the system
+   preference and the reader's own choice can never both write the palette.
+   The attribute is set before first paint by the script in <head>. */
+:root[data-theme="dark"]{
+  color-scheme: dark;
+
+  --bg:          #0b0b0d;
+  --surface:     #1c1c1e;
+  --surface-2:   #202022;
+  --material:    rgba(20, 20, 22, .72);
+  --nav-active:  #2c2c2e;
+  --segment:     #48484a;
+  --fill:        rgba(118, 118, 128, .24);
+  --fill-hover:  rgba(118, 118, 128, .16);
+  --fill-active: rgba(118, 118, 128, .32);
+
+  --text:        #f5f5f7;
+  --text-2:      #b0b0b6;
+  --text-3:      #98989d;
+
+  --line:        rgba(255, 255, 255, .10);
+  --line-strong: rgba(255, 255, 255, .20);
+
+  --accent:       #ff6b9d;
+  --accent-hover: #ff8ab2;
+  --accent-soft:  rgba(255, 107, 157, .14);
+  --accent-soft-2:rgba(255, 107, 157, .22);
+  --accent-line:  rgba(255, 107, 157, .55);
+  --accent-glow:  rgba(255, 107, 157, .09);
+
+  --shadow-sm:   0 1px 2px rgba(0, 0, 0, .40);
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, .35), 0 10px 30px -14px rgba(0, 0, 0, .60);
+  --shadow-lift: 0 2px 8px rgba(0, 0, 0, .40), 0 20px 50px -18px rgba(0, 0, 0, .70);
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
 *,*::before,*::after{ box-sizing:border-box; }
 
-html{ -webkit-text-size-adjust:100%; }
+html{
+  -webkit-text-size-adjust:100%;
+  /* keeps the iOS overscroll area on the same canvas as the page in dark mode */
+  background:var(--bg);
+}
 
 body{
   margin:0;
   min-height:100vh;
-  background:var(--stock);
-  color:var(--ink);
+  background:var(--bg);
+  color:var(--text);
   font-family:var(--font);
-  font-size:16px;
+  font-size:1.0625rem;      /* 17px: the platform body size */
   font-weight:400;
-  line-height:1.68;
-  letter-spacing:-.004em;
+  line-height:1.65;
+  letter-spacing:-.011em;
+  font-optical-sizing:auto;
   -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+/* A barely-there ambient wash gives the flat canvas a light source.
+   It is fixed and inert, so it never competes with content or motion. */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  background:
+    radial-gradient(48rem 32rem at 82% -10rem, var(--accent-glow), transparent 62%),
+    radial-gradient(40rem 30rem at 4% 108%, rgba(120, 120, 128, .05), transparent 60%);
 }
 
 a{ color:inherit; }
 
+img{ max-width:100%; }
+
+button{ font:inherit; }
+
+::selection{
+  background:var(--accent-soft-2);
+  color:var(--text);
+}
+
 :focus-visible{
-  outline:2px solid var(--spot-text);
+  outline:2px solid var(--accent);
   outline-offset:3px;
 }
 
+.sr-only{
+  position:absolute;
+  width:1px; height:1px;
+  padding:0; margin:-1px;
+  overflow:hidden;
+  clip:rect(0 0 0 0);
+  white-space:nowrap;
+  border:0;
+}
+
+/* ============================================================
+   SKIP LINK
+   ============================================================ */
 .skip{
-  position:fixed; top:.6rem; left:.6rem; z-index:80;
-  transform:translateY(-200%);
-  background:var(--ink); color:var(--sheet);
-  padding:.55rem .9rem;
-  font-size:.82rem; text-decoration:none;
-  transition:transform .18s ease;
+  position:fixed;
+  top:.75rem;
+  left:.75rem;
+  top:calc(.75rem + env(safe-area-inset-top));
+  left:calc(.75rem + env(safe-area-inset-left));
+  z-index:100;
+  transform:translateY(calc(-100% - 1.5rem));
+  padding:.6rem 1rem;
+  border-radius:var(--r-sm);
+  background:var(--text);
+  color:var(--bg);
+  font-size:.8125rem;
+  font-weight:600;
+  text-decoration:none;
+  box-shadow:var(--shadow-lift);
+  transition:transform var(--dur) var(--ease-out);
 }
 .skip:focus{ transform:none; }
 
 /* ============================================================
-   RAIL — same stock as the page, cut off by one heavy ink rule
+   APP SHELL
+   ============================================================ */
+.main{
+  position:relative;
+  z-index:1;
+  margin-left:var(--sidebar-w);
+  min-height:100vh;
+  padding:clamp(3rem, 8vh, 5.5rem) var(--gutter) clamp(4rem, 10vh, 7rem);
+  padding-bottom:calc(clamp(4rem, 10vh, 7rem) + env(safe-area-inset-bottom));
+}
+.main:focus,
+.main:focus-visible{ outline:none; }
+
+.panel{
+  --dip:.12;
+  display:none;
+  width:100%;
+  max-width:var(--shell);
+  margin-inline:auto;
+}
+.panel.is-active{ display:block; }
+
+/* a panel heading is focused after in-content navigation for screen-reader
+   orientation; it is not an interactive control, so it takes no focus ring */
+.panel h1:focus{ outline:none; }
+
+/* A change of panel is a two-phase move: the outgoing panel dips to a faint
+   trace, the incoming one is set in its place and rises back. Because the two
+   phases are never fully transparent, the swap underneath cannot be seen — it
+   reads as one continuous settle rather than a blink. The outgoing duration is
+   mirrored by LEAVE_MS in the script. */
+.panel.is-leaving{ animation:panel-out .14s var(--ease-in-out) both; }
+.panel.is-entering{ animation:panel-in .26s var(--ease-out) both; }
+@keyframes panel-out{
+  from{ opacity:1; transform:translateY(0); }
+  to{ opacity:var(--dip); transform:translateY(-4px); }
+}
+@keyframes panel-in{
+  from{ opacity:var(--dip); transform:translateY(10px); }
+  to{ opacity:1; transform:translateY(0); }
+}
+
+/* ============================================================
+   SIDEBAR — a translucent macOS-style material
    ============================================================ */
 .plate{
   position:fixed;
   inset:0 auto 0 0;
+  z-index:30;
   width:var(--sidebar-w);
-  z-index:20;
   display:flex;
   flex-direction:column;
-  gap:1.25rem;
-  padding:36px 26px 26px;
-  background:var(--stock);
-  border-right:2px solid var(--ink);
+  padding:1.75rem 1.25rem 1.25rem;
+  padding-bottom:calc(1.25rem + env(safe-area-inset-bottom));
+  background:var(--material);
+  -webkit-backdrop-filter:saturate(180%) blur(24px);
+  backdrop-filter:saturate(180%) blur(24px);
+  border-right:1px solid var(--line);
   overflow-y:auto;
+  overscroll-behavior:contain;
 }
 
-/* the one flourish in the layout: the portrait is printed with the
-   spot plate 5px out of register */
+/* No glass support: fall back to the solid canvas rather than a washy panel. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))){
+  .plate{ background:var(--bg); }
+}
+
+.avatar-ring{
+  display:inline-block;
+  align-self:flex-start;
+  line-height:0;
+}
 .avatar{
-  width:74px; height:74px;
+  width:4rem; height:4rem;
   display:block;
   object-fit:cover;
-  border:1px solid var(--ink);
-  box-shadow:5px 5px 0 var(--spot);
+  border-radius:1.25rem;
+  border:1px solid var(--line);
+  box-shadow:0 1px 2px rgba(0, 0, 0, .10), 0 8px 24px -12px rgba(0, 0, 0, .30);
 }
-.avatar-ring{ display:inline-block; line-height:0; }
 
+.identity{ margin-top:1rem; }
 .identity .name{
-  margin:1rem 0 .3rem;
-  font-size:1.35rem;
-  font-weight:700;
-  font-variation-settings:"wdth" 94;
-  letter-spacing:-.018em;
-  line-height:1.15;
+  margin:0 0 .15rem;
+  font-size:1.25rem;
+  font-weight:600;
+  letter-spacing:-.025em;
+  line-height:1.2;
 }
 .identity .role{
   margin:0;
-  font-size:.83rem;
-  line-height:1.6;
-  color:var(--ink-2);
+  font-size:.8125rem;
+  line-height:1.5;
+  letter-spacing:-.005em;
+  color:var(--text-2);
 }
+.identity .role a{ color:var(--accent); }
 
-.rule-line{
-  height:2px; border:0; margin:0;
-  background:var(--ink);
+/* nav: rounded rows, the current one lifted onto its own surface */
+.nav{ margin-top:1.75rem; }
+.nav ul{
+  list-style:none;
+  margin:0;
+  padding:0;
+  display:flex;
+  flex-direction:column;
+  gap:.125rem;
 }
-
-/* nav: a tally light in front of every row */
-.nav ul{ list-style:none; margin:0; padding:0; }
-.nav li + li{ border-top:1px solid var(--rule); }
-
 .nav a{
-  display:flex; align-items:center; gap:.75rem;
-  padding:.6rem 0;
-  color:var(--ink-2);
+  display:flex;
+  align-items:center;
+  gap:.75rem;
+  padding:.55rem .75rem;
+  border-radius:var(--r-sm);
+  color:var(--text-2);
   text-decoration:none;
-  font-size:.95rem; font-weight:500;
-  font-variation-settings:"wdth" 100;
-  transition:color .16s ease;
+  font-size:.9375rem;
+  font-weight:500;
+  letter-spacing:-.01em;
+  transition:background-color var(--dur-fast) var(--ease-out),
+             color var(--dur-fast) var(--ease-out),
+             transform var(--dur-press) var(--ease-out);
 }
-.nav a::before{
-  content:"";
+.nav-icon{
   flex:0 0 auto;
-  width:9px; height:9px;
-  border:1px solid var(--rule-2);
-  transition:background .16s ease, border-color .16s ease;
+  width:1.125rem; height:1.125rem;
+  color:var(--text-3);
+  transition:color var(--dur-fast) var(--ease-out);
 }
-.nav a:hover{ color:var(--ink); }
-.nav a:hover::before{ border-color:var(--ink); }
+.nav a:hover{
+  background:var(--fill-hover);
+  color:var(--text);
+}
+.nav a:hover .nav-icon{ color:var(--text-2); }
+.nav a:active{ transform:scale(.985); }
 .nav a[aria-current="page"]{
-  color:var(--ink);
+  background:var(--nav-active);
+  color:var(--text);
   font-weight:600;
+  box-shadow:0 0 0 .5px var(--line), var(--shadow-sm);
 }
-.nav a[aria-current="page"]::before{
-  background:var(--spot);
-  border-color:var(--spot);
+.nav a[aria-current="page"] .nav-icon{ color:var(--accent); }
+.nav a:focus-visible{ outline-offset:-2px; }
+
+/* the two reader-facing controls sit together at the foot of the sidebar:
+   the language segment, then the appearance switch. Grouping them is what
+   keeps "how the page reads" in one place instead of scattered. */
+.plate-controls{
+  display:flex;
+  align-items:center;
+  gap:.375rem;
+  margin-top:auto;
 }
 
-/* language: two words and a slash, no chrome around them */
+/* language: an iOS segmented control, not two underlined words */
 .lang{
-  display:flex; align-items:center;
-  margin-top:-.35rem;
-  font-size:.8rem;
-  font-variation-settings:"wdth" 108;
+  display:inline-flex;
+  gap:2px;
+  padding:3px;
+  border-radius:.75rem;
+  background:var(--fill);
+  font-size:.8125rem;
 }
 .lang button{
-  appearance:none; border:0; background:none; padding:.15rem 0;
-  font:inherit; font-variation-settings:inherit;
-  color:var(--ink-2); cursor:pointer;
-  border-bottom:1px solid transparent;
-  transition:color .16s ease, border-color .16s ease;
+  appearance:none; -webkit-appearance:none;
+  border:0;
+  padding:.3rem .6rem;
+  border-radius:.5625rem;
+  background:transparent;
+  color:var(--text-2);
+  font:inherit;
+  font-weight:500;
+  cursor:pointer;
+  transition:background-color var(--dur-fast) var(--ease-out),
+             color var(--dur-fast) var(--ease-out),
+             box-shadow var(--dur-fast) var(--ease-out),
+             transform var(--dur-press) var(--ease-out);
 }
-/* the slash between two languages, and its breathing room. Kept out of the
-   buttons so the active-language rule below can hug the word itself. */
-.lang-sep{ margin:0 .5rem; color:var(--rule); }
-.lang button:hover{ color:var(--ink); }
+.lang button:hover{ color:var(--text); }
+.lang button:active{ transform:scale(.97); }
 .lang button[aria-pressed="true"]{
-  color:var(--ink); font-weight:600;
-  border-bottom-color:var(--spot);
+  background:var(--segment);
+  color:var(--text);
+  font-weight:600;
+  box-shadow:var(--shadow-sm);
 }
+.lang button:focus-visible{ outline-offset:1px; }
+/* the slash exists in the old markup; the segmented control replaces it */
+.lang-sep{ display:none; }
+
+/* appearance: one button, two icons stacked in the same cell. The icon shows
+   the state the button leads to — a moon while the page is light — so the
+   picture and the label ("Switch to dark theme") say the same thing. */
+.theme-toggle{
+  position:relative;
+  flex:0 0 auto;
+  display:grid;
+  place-items:center;
+  width:2rem; height:2rem;
+  padding:0;
+  border:0;
+  border-radius:.625rem;
+  background:transparent;
+  color:var(--text-2);
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  transition:background-color var(--dur-fast) var(--ease-out),
+             color var(--dur-fast) var(--ease-out),
+             transform var(--dur-press) var(--ease-out);
+}
+.theme-toggle:hover{ background:var(--fill-hover); color:var(--text); }
+.theme-toggle:active{ transform:scale(.94); }
+.theme-toggle:focus-visible{ outline-offset:2px; }
+
+.theme-icon{
+  grid-row:1;
+  grid-column:1;
+  width:1.25rem; height:1.25rem;
+  transition:opacity var(--dur) var(--ease-out),
+             transform var(--dur) var(--ease-out);
+}
+.theme-icon--sun{ opacity:0; transform:rotate(-45deg) scale(.6); }
+.theme-icon--moon{ opacity:1; transform:none; }
+:root[data-theme="dark"] .theme-icon--sun{ opacity:1; transform:none; }
+:root[data-theme="dark"] .theme-icon--moon{ opacity:0; transform:rotate(45deg) scale(.6); }
 
 .plate-foot{
-  margin-top:auto; padding-top:1.5rem;
-  font-size:.76rem;
-  font-variation-settings:"wdth" 108;
-  letter-spacing:.01em;
-  color:var(--ink-2);
-  display:flex; align-items:center; gap:.55rem;
+  display:flex;
+  align-items:center;
+  gap:.5rem;
+  margin:1rem 0 0;
+  font-size:.75rem;
+  letter-spacing:.005em;
+  color:var(--text-3);
+  line-height:1.4;
 }
 .plate-foot .dot{
-  width:8px; height:8px;
-  background:var(--spot);
+  flex:0 0 auto;
+  width:.4375rem; height:.4375rem;
+  border-radius:50%;
+  background:var(--accent);
+  box-shadow:0 0 0 3px var(--accent-soft);
 }
 
 /* ============================================================
-   CONTENT
+   TYPE
    ============================================================ */
-.main{
-  margin-left:var(--sidebar-w);
-  min-height:100vh;
-  padding:clamp(3rem, 8vh, 5.5rem) clamp(1.5rem, 5vw, 4.5rem) 6rem;
+h1,h2,h3{
+  margin:0;
+  font-weight:600;
+  letter-spacing:-.022em;
+  line-height:1.25;
+  text-wrap:balance;
 }
-
-.panel{
-  /* the sheet is one column of --measure, and everything in it ends on that edge */
-  max-width:var(--measure); display:none;
-  /* The opacity the two phases hand over at. Faint enough to read as nothing, so
-     the swap happening underneath it cannot be seen — and not 0, so the content
-     column is never blank: the eye reads one continuous dip instead of a blink. */
-  --dip:.08;
-}
-.panel.is-active{ display:block; }
-
-/* Everything in the sheet ends on the column edge: paragraphs, headings, the
-   lede, the lists, the ledgers, the picture. The colophon is the one exception,
-   and only for its type — .79rem run the full column would be ninety-odd
-   characters to the line, so the small print is set to its own measure inside
-   the column. Padding rather than max-width, because the hairline above it is a
-   rule, and a rule belongs to the column rather than to the sentence under it. */
-.panel > .foot{ padding-right:calc(100% - 30rem); }
-
-/* Switching sheets — a short dissolve, and nothing else.
-   Printed matter does not slide, so the move is opacity only, in the same
-   .3s-ish band everything else on the page moves in. It is two phases rather
-   than a cross-dissolve because the panels sit in the normal flow (they are
-   different heights, so they have to) and their words lie straight on the paper:
-   fading one into the other would double-expose two sets of text. So the sheet
-   on screen dims first, and the incoming one is printed in its place — the two
-   meet at --dip, where neither sheet is legible and neither is missing.
-   The two easings are a pair: the out settles into the dip, the in leaves it at
-   once and eases off — so the handover is invisible and the move reads as one
-   dip rather than a blink. Both curves were picked by walking them frame by
-   frame at 60 Hz: the largest single-frame change is 0.2 either way, and the
-   step across the swap is 0.002 (the dip itself, 0.08, is the one value both
-   curves share).
-   Only a real change of sheet animates: the first paint and a language re-render
-   arrive instantly, because neither of them is a jump.
-   The out duration is mirrored by LEAVE_MS in the script below — change both
-   together. The enter class takes itself off on animationend, so its duration
-   lives here only. */
-.panel.is-leaving{ animation:panel-out .12s cubic-bezier(.35, 0, .65, 1) both; }
-.panel.is-entering{ animation:panel-in .16s cubic-bezier(0, 0, .58, 1) both; }
-@keyframes panel-out{ from{ opacity:1; } to{ opacity:var(--dip); } }
-@keyframes panel-in{ from{ opacity:var(--dip); } to{ opacity:1; } }
-
-h1,h2,h3{ margin:0; font-weight:700; letter-spacing:-.02em; line-height:1.3; }
 
 .display{
-  margin:0 0 1.1rem;
-  font-size:clamp(1.95rem, 4.1vw, 2.85rem);
-  line-height:1.12;
-  font-variation-settings:"wdth" 92;
-  /* no measure of its own: the heading is the sheet's line, so it runs the sheet
-     and breaks where the sheet breaks — never a few characters short of it */
+  max-width:var(--shell);
+  margin:0 0 1.25rem;
+  font-size:clamp(2.35rem, 5vw, 3.5rem);
+  font-weight:700;
+  letter-spacing:-.035em;
+  line-height:1.06;
   text-wrap:balance;
 }
 
 .lede{
-  margin:0 0 1.4rem;
-  font-size:1.08rem;
-  line-height:1.7;
-  color:var(--ink-2);
+  max-width:var(--measure);
+  margin:0 0 2rem;
+  font-size:clamp(1.125rem, 1.5vw, 1.3125rem);
+  line-height:1.55;
+  letter-spacing:-.012em;
+  color:var(--text-2);
+  text-wrap:pretty;
 }
+
 p{
-  margin:0 0 1.15rem;
-  /* the column above measures it now — a second ch limit here would only make the
-     paragraphs stop short of the column they were given */
-  max-width:none;
+  max-width:var(--measure);
+  margin:0 0 1.25rem;
+  line-height:1.7;
   overflow-wrap:break-word;
+  text-wrap:pretty;
 }
 p:last-child{ margin-bottom:0; }
 
-/* A blank line inside a paragraph (`\n\n` in the JSON) — a wider break than a plain
-   newline, which is just the line box's own leading (~9.7px at the body sizes). This
-   adds 0.6rem on top of that, landing at ~19px end to end: about the weight of the
-   1.15rem paragraph rhythm. Deliberate — inside one paragraph, a blank line should read
-   as heavily as a new paragraph, without actually splitting the text in two. */
-.line-gap{ display:block; height:.6rem; }
+/* the blank line inside a paragraph from the JSON data */
+.line-gap{ display:block; height:.5rem; }
+
+/* A line that begins with a hyphen in the data is a list line. It becomes a
+   proper bullet mark here, so a stack of platform links reads as a list
+   without the punctuation colliding with the first letter of each link. */
+.list-mark{
+  display:inline-block;
+  width:.36em; height:.36em;
+  margin-right:.6em;
+  border-radius:50%;
+  background:var(--text-3);
+  vertical-align:.16em;
+}
 
 .section-title{
-  margin:3rem 0 1rem;
-  padding-top:.7rem;
-  border-top:2px solid var(--ink);
-  font-size:1.08rem;
-  font-variation-settings:"wdth" 104;
-  letter-spacing:-.008em;
-  line-height:1.35;
-  text-wrap:balance;
+  max-width:var(--measure);
+  margin:3.25rem 0 1.5rem;
+  padding-top:1.75rem;
+  border-top:1px solid var(--line);
+  font-size:1.375rem;
+  font-weight:600;
+  letter-spacing:-.022em;
+  line-height:1.3;
 }
 
+/* ============================================================
+   LINKS
+   ============================================================ */
 .link{
-  color:var(--spot-text);
+  color:var(--accent);
   text-decoration:underline;
   text-decoration-thickness:1px;
-  text-underline-offset:2px;
-  transition:text-decoration-thickness .14s ease, background .14s ease;
+  text-decoration-color:var(--accent-line);
+  text-underline-offset:.18em;
+  overflow-wrap:break-word;
+  transition:color var(--dur-fast) var(--ease-out),
+             text-decoration-color var(--dur-fast) var(--ease-out),
+             text-decoration-thickness var(--dur-fast) var(--ease-out);
 }
 .link:hover{
-  text-decoration-thickness:3px;
-  background:var(--tint);
+  color:var(--accent-hover);
+  text-decoration-color:currentColor;
+  text-decoration-thickness:2px;
 }
 
-/* the latest upload: real material, cropped back to 16:9 */
-.video{ margin:0 0 1.75rem; }
-/* the picture wrapper only — the caption's own link must stay inline,
-   otherwise it picks up the frame border and pushes the caption to a new line */
-.video > a{
-  display:block;
-  border:1px solid var(--ink);
-  transition:box-shadow .16s ease;
+/* ============================================================
+   MEDIA
+   ============================================================ */
+.video{
+  /* the cover is a small source; the reading measure keeps it from being
+     blown up across the full shell */
+  max-width:var(--measure);
+  margin:0 0 2rem;
 }
-.video > a:hover{ box-shadow:inset 0 0 0 2px var(--spot); }
+.video > a,
+.video > img{
+  display:block;
+  border-radius:var(--r-lg);
+  overflow:hidden;
+  background:var(--surface-2);
+  border:1px solid var(--line);
+  box-shadow:var(--shadow-card);
+}
+.video > a{
+  transition:transform var(--dur-slow) var(--ease-out),
+             box-shadow var(--dur-slow) var(--ease-out);
+}
+.video > a:hover{
+  transform:translateY(-2px);
+  box-shadow:var(--shadow-lift);
+}
+.video > a:focus-visible{ box-shadow:var(--shadow-lift); }
 .video img{
-  display:block; width:100%;
+  display:block;
+  width:100%;
   aspect-ratio:16 / 9;
   object-fit:cover;
+  transition:transform .6s var(--ease-out);
 }
+.video > a:hover img{ transform:scale(1.025); }
 .video figcaption{
-  margin-top:.65rem;
-  font-size:.82rem;
-  color:var(--ink-2);
+  margin-top:.875rem;
+  font-size:.8125rem;
+  line-height:1.55;
+  color:var(--text-2);
 }
-/* the embedded Bilibili player sits in the same 16:9 frame a still would */
 .video-embed{
-  display:block; width:100%;
+  display:block;
+  width:100%;
   aspect-ratio:16 / 9;
-  border:1px solid var(--ink);
-  background:var(--ink);
+  border:1px solid var(--line);
+  border-radius:var(--r-lg);
+  background:#000;
 }
-.video-more{ display:block; margin-top:.35rem; }
+.video-more{ display:block; margin-top:.25rem; }
 
-/* rows: hairlines, and a marker underline where the pointer is.
-   The hairlines run the column like every other rule on the sheet. */
-.rows{ list-style:none; margin:0; padding:0; }
-.rows > li{ border-bottom:1px solid var(--rule); }
-.rows > li:first-child{ border-top:1px solid var(--rule); }
+/* ============================================================
+   FIND ME — four channels as a ledger, not a card
+   The service is the label, the account is the name, the handle is
+   the reference. Hairlines do the grouping: the page already gives
+   three surfaces further down, and this block is still text.
+   ============================================================ */
+.channels{
+  max-width:var(--measure);
+  margin:0 0 2.5rem;
+}
+.channels-lead{
+  max-width:none;
+  margin:0 0 .875rem;
+  font-size:.9375rem;
+  line-height:1.5;
+  color:var(--text-2);
+}
 
-/* text starts on the same left edge as the headings; the hover wash and the
-   hairline share that edge, so nothing looks nudged out of line */
-.row{
-  display:flex; align-items:baseline; gap:2rem;
-  padding:1.15rem 0;
+.channels-list{
+  list-style:none;
+  margin:0;
+  padding:0;
+  border-top:1px solid var(--line);
+}
+.channels-list > li{ border-bottom:1px solid var(--line); }
+
+.channel{
+  display:grid;
+  grid-template-columns:7.25rem minmax(0, 1fr) auto 1.125rem;
+  grid-template-areas:"plat acct handle arrow";
+  align-items:center;
+  column-gap:1.25rem;
+  padding:.875rem 0;
+  color:inherit;
   text-decoration:none;
-  transition:background .16s ease;
 }
-.row:hover{ background:var(--sheet); }
+.channel-platform{
+  grid-area:plat;
+  font-size:.8125rem;
+  line-height:1.4;
+  letter-spacing:.01em;
+  color:var(--text-3);
+  overflow-wrap:break-word;
+}
+.channel-account{
+  grid-area:acct;
+  min-width:0;
+  font-size:1.0625rem;
+  font-weight:500;
+  line-height:1.4;
+  letter-spacing:-.012em;
+  overflow-wrap:break-word;
+  transition:color var(--dur-fast) var(--ease-out);
+}
+/* handles are references, not prose — the mono face says so */
+.channel-handle{
+  grid-area:handle;
+  justify-self:end;
+  font-family:var(--mono);
+  font-size:.75rem;
+  line-height:1.4;
+  letter-spacing:.01em;
+  font-variant-numeric:tabular-nums;
+  color:var(--text-3);
+  white-space:nowrap;
+}
+.channel[href]::after{
+  content:"";
+  grid-area:arrow;
+  justify-self:end;
+  width:.6875rem; height:.6875rem;
+  background:var(--text-3);
+  -webkit-mask:var(--icon-external) center/contain no-repeat;
+  mask:var(--icon-external) center/contain no-repeat;
+  transition:background-color var(--dur-fast) var(--ease-out),
+             transform var(--dur-fast) var(--ease-out);
+}
+a.channel:hover .channel-account{ color:var(--accent); }
+a.channel:hover::after{ background:var(--accent); transform:translate(2px, 0); }
+a.channel:active .channel-account{ color:var(--accent-hover); }
+.channel:focus-visible{ outline-offset:-2px; border-radius:var(--r-sm); }
+
+.channels-summary{
+  max-width:none;
+  margin:1.125rem 0 0;
+  font-size:.9375rem;
+  line-height:1.55;
+  color:var(--text-2);
+}
+
+/* the open-source note reads as a footnote to the page, not as an item in
+   the list above: a small label, then the sentence, then the address */
+.source{ max-width:var(--measure); }
+.source-label{
+  margin:0 0 .5rem;
+  font-size:.6875rem;
+  font-weight:600;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--text-3);
+}
+.source-text{
+  max-width:46rem;
+  margin:0 0 .5rem;
+  font-size:.9375rem;
+  line-height:1.6;
+  color:var(--text-2);
+}
+.source-url{
+  font-size:.9375rem;
+  overflow-wrap:anywhere;
+}
+
+/* ============================================================
+   LIST ROWS — one grouped surface, like an iOS settings list
+   ============================================================ */
+.rows{
+  list-style:none;
+  max-width:var(--shell);
+  margin:0;
+  padding:0;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--r-lg);
+  box-shadow:var(--shadow-card);
+  overflow:hidden;
+}
+.rows > li{ border-bottom:1px solid var(--line); }
+.rows > li:last-child{ border-bottom:0; }
+
+.row{
+  position:relative;
+  display:flex;
+  align-items:center;
+  gap:1.5rem;
+  padding:1.125rem 3.25rem 1.125rem 1.25rem;
+  text-decoration:none;
+  transition:background-color var(--dur-fast) var(--ease-out);
+}
+a.row:hover{ background:var(--fill-hover); }
+a.row:active{ background:var(--fill-active); }
+.row:focus-visible{ outline-offset:-3px; border-radius:0; }
+
+/* the disclosure chevron applies only to rows that actually go somewhere */
+.row[href]::after{
+  content:"";
+  position:absolute;
+  top:50%; right:1.4rem;
+  width:.4375rem; height:.4375rem;
+  border-top:1.5px solid var(--text-3);
+  border-right:1.5px solid var(--text-3);
+  transform:translateY(-50%) rotate(45deg);
+  transition:border-color var(--dur-fast) var(--ease-out),
+             transform var(--dur-fast) var(--ease-out);
+}
+a.row:hover::after{
+  border-color:var(--accent);
+  transform:translate(2px, -50%) rotate(45deg);
+}
+
+/* a link that leaves the site says so with an arrow, not a disclosure chevron */
+.row[href].row--external::after{
+  content:"";
+  width:.6875rem; height:.6875rem;
+  border:0;
+  background:var(--text-3);
+  -webkit-mask:var(--icon-external) center/contain no-repeat;
+  mask:var(--icon-external) center/contain no-repeat;
+  transform:translateY(-50%);
+  transition:background-color var(--dur-fast) var(--ease-out),
+             transform var(--dur-fast) var(--ease-out);
+}
+.row[href].row--external:hover::after{
+  background:var(--accent);
+  transform:translate(2px, -50%);
+}
 
 .row-main{ flex:1 1 auto; min-width:0; }
 .row-title{
-  font-size:1.02rem;
-  font-variation-settings:"wdth" 96;
-  line-height:1.35;
-  margin-bottom:.3rem;
+  margin:0 0 .25rem;
+  font-size:1.0625rem;
+  font-weight:600;
+  letter-spacing:-.012em;
+  line-height:1.4;
+  transition:color var(--dur-fast) var(--ease-out);
 }
-.row:hover .row-title{
-  text-decoration:underline;
-  text-decoration-thickness:2px;
-  text-decoration-color:var(--spot);
-  text-underline-offset:3px;
-}
+a.row:hover .row-title{ color:var(--accent); }
 .row-note{
+  max-width:none;
   margin:0;
-  font-size:.89rem; line-height:1.62;
-  color:var(--ink-2);
+  font-size:.875rem;
+  line-height:1.55;
+  color:var(--text-2);
   overflow-wrap:break-word;
 }
 .row-meta{
   flex:0 0 auto;
-  font-size:.78rem;
-  font-variation-settings:"wdth" 108;
-  color:var(--ink-2);
+  font-size:.75rem;
+  letter-spacing:.01em;
+  font-variant-numeric:tabular-nums;
+  color:var(--text-3);
   white-space:nowrap;
 }
 
-/* rundown table on the home page */
-.index{ margin:0; }
-.index div{
-  display:flex; align-items:baseline; gap:1.5rem;
-  padding:.85rem 0;
-  border-bottom:1px solid var(--rule);
+/* ============================================================
+   ARTICLE INDEX — one featured story, then a compact list
+   ============================================================ */
+.feature{
+  position:relative;
+  display:block;
+  max-width:var(--shell);
+  margin:0;
+  padding:2rem 4rem 2rem 2rem;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--r-lg);
+  box-shadow:var(--shadow-card);
+  color:inherit;
+  text-decoration:none;
+  transition:transform var(--dur-slow) var(--ease-out),
+             box-shadow var(--dur-slow) var(--ease-out);
 }
-.index div:first-child{ border-top:1px solid var(--ink); }
+a.feature:hover{
+  transform:translateY(-2px);
+  box-shadow:var(--shadow-lift);
+}
+a.feature:hover .feature-title{ color:var(--accent); }
+.feature:focus-visible{ outline-offset:3px; }
+
+.feature-body{ display:flex; flex-direction:column; }
+.feature-title{
+  margin:0;
+  font-size:clamp(1.5rem, 2.6vw, 2rem);
+  font-weight:600;
+  letter-spacing:-.03em;
+  line-height:1.15;
+  text-wrap:balance;
+  transition:color var(--dur-fast) var(--ease-out);
+}
+.feature-meta{
+  order:-1;
+  margin:0 0 .65rem;
+  font-size:.75rem;
+  letter-spacing:.04em;
+  font-variant-numeric:tabular-nums;
+  color:var(--text-3);
+}
+.feature-note{
+  max-width:46rem;
+  margin:.75rem 0 0;
+  font-size:1rem;
+  line-height:1.6;
+  color:var(--text-2);
+}
+a.feature::after{
+  content:"";
+  position:absolute;
+  top:50%; right:2rem;
+  width:.5625rem; height:.5625rem;
+  border-top:1.5px solid var(--text-3);
+  border-right:1.5px solid var(--text-3);
+  transform:translateY(-50%) rotate(45deg);
+  transition:border-color var(--dur-fast) var(--ease-out),
+             transform var(--dur-fast) var(--ease-out);
+}
+a.feature:hover::after{
+  border-color:var(--accent);
+  transform:translate(2px, -50%) rotate(45deg);
+}
+/* an article whose link leaves the site keeps the outbound arrow used by rows */
+a.feature.feature--external::after{
+  width:.6875rem; height:.6875rem;
+  border:0;
+  background:var(--text-3);
+  -webkit-mask:var(--icon-external) center/contain no-repeat;
+  mask:var(--icon-external) center/contain no-repeat;
+  transform:translateY(-50%);
+  transition:background-color var(--dur-fast) var(--ease-out),
+             transform var(--dur-fast) var(--ease-out);
+}
+a.feature.feature--external:hover::after{
+  background:var(--accent);
+  transform:translate(2px, -50%);
+}
+.article-list{ margin-top:1.25rem; }
+
+/* ============================================================
+   RUNDOWN LIST
+   ============================================================ */
+.index{
+  max-width:var(--measure);
+  margin:0;
+  padding:0 1.25rem;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--r-lg);
+  box-shadow:var(--shadow-card);
+}
+.index div{
+  display:flex;
+  align-items:baseline;
+  gap:1.5rem;
+  padding:1rem 0;
+  border-bottom:1px solid var(--line);
+}
+.index div:last-child{ border-bottom:0; }
 .index dt{
   flex:0 0 10rem;
-  font-size:.8rem;
-  font-variation-settings:"wdth" 108;
-  color:var(--ink-2);
+  font-size:.75rem;
+  font-weight:500;
+  letter-spacing:.02em;
+  color:var(--text-3);
 }
-.index dd{ margin:0; flex:1 1 auto; font-size:.94rem; overflow-wrap:break-word; }
+.index dd{
+  margin:0;
+  flex:1 1 auto;
+  font-size:.9375rem;
+  line-height:1.55;
+  overflow-wrap:break-word;
+}
 
-/* works & achievements: a dated rail. One printed rule down the middle, a spot
-   square for every entry, and the card hung off it on the right.
-   The date is set flush left, so the ledger stands on the same left edge as the
-   heading and the lede above it — every date in the data starts with the year,
-   so flush left keeps the years in their own column just as right-alignment did,
-   while the first thing the eye meets in a row is the sheet's own edge. */
+/* ============================================================
+   EXPLORE — data-driven ways into the other panels
+   ============================================================ */
+.explore{ max-width:var(--shell); }
+.explore .section-title{ max-width:none; margin-bottom:1.25rem; }
+.explore-grid{
+  display:flex;
+  flex-wrap:wrap;
+  gap:1px;
+  background:var(--line);
+  border:1px solid var(--line);
+  border-radius:var(--r-lg);
+  overflow:hidden;
+  box-shadow:var(--shadow-card);
+}
+.explore-card{
+  position:relative;
+  display:flex;
+  flex:1 1 15rem;
+  min-width:0;
+  align-items:flex-start;
+  gap:.85rem;
+  padding:1.25rem 2.75rem 1.25rem 1.25rem;
+  background:var(--surface);
+  color:inherit;
+  text-decoration:none;
+  transition:background-color var(--dur-fast) var(--ease-out);
+}
+.explore-card:hover{ background:var(--surface-2); }
+.explore-card:focus-visible{ outline-offset:-3px; border-radius:0; }
+.explore-icon{
+  flex:0 0 auto;
+  display:grid;
+  place-items:center;
+  width:2rem; height:2rem;
+  border-radius:.625rem;
+  background:var(--fill);
+  color:var(--accent);
+}
+.explore-icon .nav-icon{ width:1.125rem; height:1.125rem; color:currentColor; }
+.explore-body{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:.25rem;
+}
+.explore-title{
+  font-size:1rem;
+  font-weight:600;
+  letter-spacing:-.012em;
+  line-height:1.35;
+  transition:color var(--dur-fast) var(--ease-out);
+}
+.explore-desc{
+  display:block;
+  font-size:.8125rem;
+  line-height:1.5;
+  color:var(--text-2);
+}
+.explore-card::after{
+  content:"";
+  position:absolute;
+  top:1.65rem; right:1.25rem;
+  width:.375rem; height:.375rem;
+  border-top:1.5px solid var(--text-3);
+  border-right:1.5px solid var(--text-3);
+  transform:rotate(45deg);
+  transition:border-color var(--dur-fast) var(--ease-out),
+             transform var(--dur-fast) var(--ease-out);
+}
+.explore-card:hover .explore-title{ color:var(--accent); }
+.explore-card:hover::after{
+  border-color:var(--accent);
+  transform:translateX(2px) rotate(45deg);
+}
+
+/* ============================================================
+   TIMELINE — an open ledger. Typography and the dated rail carry
+   the hierarchy; the entries themselves are not container cards.
+   ============================================================ */
 .timeline{
-  --t-date: 4rem;     /* the ledger column — as wide as the longest date the
-                         data actually carries (2026.10 ≈ 3.25rem) plus air, so
-                         a longer one still lands short of the rail */
-  --t-rail: 1.5rem;   /* the rail the spine runs down */
-  /* where the middle of a card's first line sits, measured down from the row's
-     top: the card's own top padding, plus half the title's line box
-     (1.1rem + 1.02rem × 1.4 ÷ 2). The date, the square and the pointer all hang
-     off this one number, so nothing drifts out of line when the card changes. */
-  --t-lead: 1.81rem;
+  --t-date:4.5rem;
+  --t-rail:1.75rem;
   position:relative;
   list-style:none;
-  margin:0; padding:0;
+  max-width:var(--measure);
+  margin:0;
+  padding:0;
 }
-/* one continuous rule behind every row, so the segments can never seam */
 .timeline::before{
   content:"";
   position:absolute;
-  inset:0 auto 0 calc(var(--t-date) + var(--t-rail) / 2 - 1px);
-  width:2px;
-  background:var(--ink);
+  top:1.4rem; bottom:1.4rem;
+  left:calc(var(--t-date) + var(--t-rail) / 2 - .5px);
+  width:1px;
+  background:linear-gradient(to bottom,
+    var(--line-strong) 0,
+    var(--line) 8%,
+    var(--line) 88%,
+    transparent 100%);
 }
 .tl-item{
   display:grid;
-  grid-template-columns:var(--t-date) var(--t-rail) 1fr;
+  grid-template-columns:var(--t-date) var(--t-rail) minmax(0, 1fr);
   grid-template-areas:"date rail card";
   align-items:start;
-  padding:0 0 1.4rem;
+  padding:1.4rem 0 1.3rem;
+  border-bottom:1px solid var(--line);
 }
-/* An entry the filter has ruled out. The row has to say so itself: `display:grid`
-   above outranks the browser's own [hidden] rule, so without this the entry
-   would stay on the sheet and the filter would look broken. */
+.tl-item:last-child{ border-bottom:0; }
+/* grid outranks the browser's [hidden] rule, so it has to be restated */
 .tl-item[hidden]{ display:none; }
 
 .tl-date{
   grid-area:date;
-  /* its own line box is .74rem × 1.68, so this lands its centre on --t-lead.
-     No side padding: the date's own left edge has to be the column's, or the
-     ledger stops lining up with the sheet's edge above it. */
-  padding:calc(var(--t-lead) - .62rem) 0 0;
-  text-align:left;
-  font-size:.74rem; font-weight:500;
-  font-variation-settings:"wdth" 112;
+  padding-top:.35rem;
+  font-size:.75rem;
+  font-weight:500;
   letter-spacing:.03em;
   font-variant-numeric:tabular-nums;
-  color:var(--ink-2);
+  color:var(--text-3);
 }
-/* the tally light again, one size up and printed in the spot ink. It stays the
-   biggest mark on the rail — the pointer below is deliberately smaller, so the
-   colour reads as the anchor and the wedge as its tail. The ring is the stock
-   colour, so the spine is knocked out around it instead of bleeding into it —
-   the same trick as the portrait's offset plate, without the offset. */
 .tl-node{
   grid-area:rail;
   justify-self:center;
-  width:13px; height:13px;
-  margin-top:calc(var(--t-lead) - .41rem);   /* half of the square */
-  background:var(--spot);
-  box-shadow:0 0 0 3px var(--stock);
+  width:.5625rem; height:.5625rem;
+  margin-top:.62rem;
+  border-radius:50%;
+  background:var(--accent);
+  box-shadow:0 0 0 4px var(--bg), 0 0 0 5px var(--accent-soft);
 }
-
 .tl-card{
   grid-area:card;
-  position:relative;
-  /* small: the square sits in the middle of the 1.5rem rail, so the visible gap
-     between them is this plus half the rail */
-  margin-left:.15rem;
-  padding:1.1rem clamp(1rem, 2.2vw, 1.3rem);
-  background:var(--sheet);
-  border:1px solid var(--ink);
-  transition:background .16s ease;
+  margin-left:.75rem;
+  padding:0;
+  background:transparent;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
 }
-.tl-card:hover{ background:var(--sheet-hi); }
-/* the pointer back to the rail: a hard ink wedge, same ink as the card's own
-   rule, sized to exactly span the gap between the square and the card's edge.
-   The extra 1px is the card's own border — `top` here is measured from its
-   padding box. */
-.tl-card::before{
-  content:"";
-  position:absolute; left:-8px; top:calc(var(--t-lead) - 6.5px);
-  width:9px; height:11px;
-  background:var(--ink);
-  clip-path:polygon(100% 0, 0 50%, 100% 100%);
+.tl-head{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:baseline;
+  gap:.5rem .75rem;
 }
-.tl-head{ display:flex; flex-wrap:wrap; align-items:baseline; gap:.9rem; }
 .tl-title{
   margin:0;
-  font-size:1.02rem;
-  font-variation-settings:"wdth" 96;
-  line-height:1.4;
+  font-size:1.375rem;
+  font-weight:600;
+  letter-spacing:-.022em;
+  line-height:1.3;
 }
-/* the type plate and the optional kind both hang on the far end of the title
-   line. Each carries margin-left:auto — the first one to claim it takes all the
-   free space and the other gets none — so either can sit there alone, and with
-   both they pair up on the right without needing a wrapper element. */
+.tl-title .link{
+  color:inherit;
+  text-decoration:none;
+}
+.tl-title .link:hover{
+  color:var(--accent);
+  text-decoration:underline;
+}
+/* the work title is the project link; a small outbound arrow says so without
+   colouring every title pink */
+.tl-link::after{
+  content:"";
+  display:inline-block;
+  width:.5625rem; height:.5625rem;
+  margin-left:.45rem;
+  background:var(--text-3);
+  -webkit-mask:var(--icon-external) center/contain no-repeat;
+  mask:var(--icon-external) center/contain no-repeat;
+  vertical-align:.05em;
+  transition:background-color var(--dur-fast) var(--ease-out);
+}
+.tl-link:hover::after{ background:var(--accent); }
+.tl-tail{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:.5rem;
+  margin-left:auto;
+}
+.tl-tags{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.375rem;
+}
 .tl-kind{
-  margin-left:auto; flex:0 0 auto;
-  font-size:.72rem; font-weight:500;
-  font-variation-settings:"wdth" 112;
-  letter-spacing:.03em;
-  color:var(--ink-2);
+  font-size:.75rem;
+  letter-spacing:.01em;
+  color:var(--text-3);
 }
 .tl-note{
+  max-width:46rem;
   margin:.5rem 0 0;
-  font-size:.89rem; line-height:1.62;
-  color:var(--ink-2);
+  font-size:.9375rem;
+  line-height:1.6;
+  color:var(--text-2);
   overflow-wrap:break-word;
 }
 
-/* Narrow screens used to fold the ledger column up over the card, which put the
-   date's left edge wherever the rail happened to be — a second left edge for the
-   same page. The ledger now keeps its column at every width instead: a phone
-   pays for it in card width (about 180px at the narrowest), and the sheet keeps
-   the single left edge its heading, lede and dates all stand on. */
-
-/* The filter, on the line under the lede, and the tags, under the rail.
-   A control in this sheet is bare type with a small mark in front of it — the
-   nav does exactly this — while a box in this sheet is a surface that holds
-   something. So the filter is type and a tally light, and a tag is a plate.
-   A paper tag and a button therefore never look alike, which is the point:
-   the buttons above are pressed, the tags below are only the page's own filing. */
+/* ============================================================
+   FILTER + TAGS
+   ============================================================ */
 .filter{
-  display:flex; flex-wrap:wrap; align-items:center;
-  gap:.9rem 1.6rem;
-  margin:0 0 1.9rem;
+  display:inline-flex;
+  align-items:center;
+  gap:2px;
+  max-width:100%;
+  margin:0 0 1.75rem;
+  padding:3px;
+  border-radius:.75rem;
+  background:var(--fill);
+  overflow-x:auto;
+  scrollbar-width:none;
 }
+.filter::-webkit-scrollbar{ display:none; }
+
 .filter-btn{
   appearance:none; -webkit-appearance:none;
-  border:0; background:none; padding:0; margin:0;
-  display:flex; align-items:center; gap:.55rem;
-  font-family:inherit; font-size:.8rem; font-weight:500;
-  font-variation-settings:"wdth" 108;
-  letter-spacing:.02em;
-  color:var(--ink-2);
+  border:0;
+  margin:0;
+  padding:.35rem .7rem;
+  border-radius:.5625rem;
+  background:transparent;
+  color:var(--text-2);
+  font:inherit;
+  font-size:.8125rem;
+  font-weight:500;
+  letter-spacing:-.005em;
+  white-space:nowrap;
   cursor:pointer;
-  transition:color .16s ease;
+  transition:background-color var(--dur-fast) var(--ease-out),
+             color var(--dur-fast) var(--ease-out),
+             box-shadow var(--dur-fast) var(--ease-out),
+             transform var(--dur-press) var(--ease-out);
 }
-/* the tally light, one size down from the nav's and with the same two states:
-   an empty ring for a plain choice, spot ink for the one in force */
-.filter-btn::before{
-  content:"";
-  flex:0 0 auto;
-  width:9px; height:9px;
-  border:1px solid var(--rule-2);
-  transition:background .16s ease, border-color .16s ease;
+.filter-btn:hover{ color:var(--text); }
+.filter-btn:active{ transform:scale(.97); }
+.filter-btn[aria-pressed="true"]{
+  background:var(--segment);
+  color:var(--text);
+  font-weight:600;
+  box-shadow:var(--shadow-sm);
 }
-.filter-btn:hover{ color:var(--ink); }
-.filter-btn:hover::before{ border-color:var(--ink); }
-.filter-btn[aria-pressed="true"]{ color:var(--ink); font-weight:600; }
-.filter-btn[aria-pressed="true"]::before{
-  background:var(--spot); border-color:var(--spot);
-}
+.filter-btn:focus-visible{ outline-offset:0; }
 
-/* a tag is a small plate — the same plate on the entry and in the list below,
-   so the two read as one label seen twice rather than two different things */
 .tag,
 .tl-tag{
-  flex:0 0 auto;
-  padding:.08rem .42rem;
-  border:1px solid var(--rule-2);
-  font-size:.72rem; font-weight:500;
-  font-variation-settings:"wdth" 112;
-  letter-spacing:.03em;
-  line-height:1.35;
-  color:var(--ink-2);
+  display:inline-flex;
+  align-items:center;
+  padding:.2rem .55rem;
+  border-radius:var(--r-pill);
+  background:var(--fill);
+  color:var(--text-2);
+  font-size:.6875rem;
+  font-weight:500;
+  letter-spacing:.015em;
+  line-height:1.4;
   white-space:nowrap;
 }
-.tl-tag{ margin-left:auto; }
 
-/* the page's own filing, under the rail and on the rail's left edge: the rule
-   above it is the sheet's heavy rule, the same one a section break uses */
 .taglist{
-  display:flex; flex-wrap:wrap; align-items:center;
-  gap:.5rem .5rem;
-  margin:1.6rem 0 0;      /* plus the last row's 1.4rem = the 3rem a section break takes */
-  padding:.85rem 0 0;
-  border-top:2px solid var(--ink);
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:.5rem;
+  max-width:var(--measure);
+  margin:2rem 0 0;
+  padding-top:1.25rem;
+  border-top:1px solid var(--line);
 }
 .taglist-label{
-  flex:0 0 auto;
-  margin-right:.35rem;
-  font-size:.74rem; font-weight:600;
-  font-variation-settings:"wdth" 112;
-  letter-spacing:.03em;
-  color:var(--ink);
+  margin-right:.25rem;
+  font-size:.75rem;
+  font-weight:600;
+  letter-spacing:.02em;
+  color:var(--text-3);
 }
 
+/* ============================================================
+   COLOPHON
+   ============================================================ */
 .foot{
-  margin:3rem 0 0; padding-top:1rem;
-  border-top:1px solid var(--rule);
-  font-size:.79rem; line-height:1.65;
-  color:var(--ink-2);
+  max-width:var(--measure);
+  margin:3.25rem 0 0;
+  padding-top:1.25rem;
+  border-top:1px solid var(--line);
+  font-size:.75rem;
+  line-height:1.6;
+  color:var(--text-3);
+  overflow-wrap:break-word;
+}
+.foot code{
+  padding:.1em .35em;
+  border-radius:.25rem;
+  background:var(--fill);
+  font-family:var(--mono);
+  font-size:.95em;
 }
 
-/* a post: same column as the panels, one step narrower for long reading.
-   Body blocks are data (see data/posts/*.json) — this is only the type. */
+/* ============================================================
+   POSTS
+   ============================================================ */
 .post-back{
-  margin:0 0 1.5rem;
-  font-size:.82rem;
-  font-variation-settings:"wdth" 108;
+  margin:0 0 1.75rem;
+  font-size:.8125rem;
+  font-weight:500;
+}
+.post-back .link{
+  display:inline-flex;
+  align-items:center;
+  gap:.35rem;
+  padding:.4rem .75rem;
+  border-radius:var(--r-pill);
+  background:var(--surface);
+  border:1px solid var(--line);
+  box-shadow:var(--shadow-sm);
+  color:var(--text-2);
+  text-decoration:none;
+  transition:color var(--dur-fast) var(--ease-out),
+             border-color var(--dur-fast) var(--ease-out),
+             transform var(--dur-fast) var(--ease-out);
+}
+.post-back .link:hover{
+  color:var(--text);
+  border-color:var(--line-strong);
+  transform:translateX(-2px);
 }
 .post-meta{
-  margin:.55rem 0 0;
-  font-size:.76rem; font-variation-settings:"wdth" 112;
-  letter-spacing:.02em;
-  color:var(--ink-2);
+  margin:.75rem 0 0;
+  font-size:.75rem;
+  letter-spacing:.04em;
+  font-variant-numeric:tabular-nums;
+  text-transform:uppercase;
+  color:var(--text-3);
 }
+.post-meta + .prose{ margin-top:2rem; }
 
-/* a post has no second column, so it reads as one sheet of type, measured by
-   .panel > .prose above like every other block of running text */
-/* a post with no lede: without this the date sits flush against the first block,
-   because the first child's own top margin is zeroed just below */
-.post-meta + .prose{ margin-top:1.5rem; }
+.prose{ max-width:var(--measure); }
 .prose > *:first-child{ margin-top:0; }
 .prose > *:last-child{ margin-bottom:0; }
 
-/* top margins only, so the rhythm never doubles up */
-.prose p{ margin:1.05rem 0 0; }
+.prose p{ margin:1.25rem 0 0; }
 .prose h2{
-  margin:2.3rem 0 0;
-  font-size:1.1rem;
-  font-variation-settings:"wdth" 100;
+  margin:2.75rem 0 0;
+  font-size:1.5rem;
+  letter-spacing:-.022em;
 }
 .prose h3{
-  margin:1.8rem 0 0;
-  font-size:.99rem;
+  margin:2rem 0 0;
+  font-size:1.125rem;
 }
-.prose ul,.prose ol{ margin:1.05rem 0 0; padding-left:1.2rem; }
-.prose li{ margin:.3rem 0; }
-.prose li::marker{ color:var(--spot-text); }
+.prose ul,
+.prose ol{
+  margin:1.25rem 0 0;
+  padding-left:1.35rem;
+}
+.prose li{ margin:.4rem 0; }
+.prose li::marker{ color:var(--accent); }
 
 .prose blockquote{
-  margin:1.5rem 0 0;
-  padding:.15rem 0 .15rem 1.1rem;
-  border-left:3px solid var(--spot);
-  color:var(--ink-2);
+  margin:1.75rem 0 0;
+  padding:.9rem 1.25rem;
+  border-left:3px solid var(--accent);
+  border-radius:0 var(--r-md) var(--r-md) 0;
+  background:var(--accent-soft);
+  color:var(--text-2);
 }
 
 .prose pre{
-  margin:1.4rem 0 0;
-  padding:1rem 1.15rem;
+  margin:1.5rem 0 0;
+  padding:1rem 1.25rem;
   overflow-x:auto;
-  background:var(--sheet);
-  border-left:3px solid var(--ink);
-  font-size:.83rem; line-height:1.62;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--r-md);
+  box-shadow:var(--shadow-sm);
+  font-size:.8125rem;
+  line-height:1.6;
 }
-.prose code{
-  font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-}
-/* emphasis inside a sentence, without the variable font drifting wider */
-.prose strong{ font-weight:700; font-variation-settings:"wdth" 100; }
-.prose p code,.prose li code{
-  background:var(--tint);
-  padding:.1em .35em;
+.prose code{ font-family:var(--mono); }
+.prose p code,
+.prose li code{
+  padding:.12em .35em;
+  border-radius:.3125rem;
+  background:var(--fill);
   font-size:.9em;
 }
+.prose strong{ font-weight:600; }
 
-.prose figure{ margin:1.8rem 0 0; }
-.prose figure img{ display:block; width:100%; border:1px solid var(--ink); }
+.prose figure{ margin:2rem 0 0; }
+.prose figure img{
+  display:block;
+  width:100%;
+  border:1px solid var(--line);
+  border-radius:var(--r-lg);
+  box-shadow:var(--shadow-card);
+}
 .prose figure figcaption{
-  margin-top:.7rem;
-  font-size:.78rem; line-height:1.6;
-  color:var(--ink-2);
+  margin-top:.75rem;
+  font-size:.75rem;
+  line-height:1.6;
+  color:var(--text-3);
 }
 
 /* ============================================================
-   NARROW SCREENS — the rail becomes a masthead band
+   TABLET / MOBILE — the sidebar becomes a masthead
    ============================================================ */
-@media (max-width: 940px){
-  /* the masthead and the content share one left edge */
+/* The sidebar stays until the content column would drop below ~620px. Measured,
+   that is the last width where the works rail still reads as a rail: most
+   titles fit on one line, the longest takes two, and the type tags stay beside
+   them. At 900 the same titles break and the tags drop onto a line of their
+   own. Below the breakpoint the masthead hands the column the sidebar's width
+   back, so the step at the boundary is a gain of ~260px of text, not a squeeze. */
+@media (max-width:959px){
   .main{
     margin-left:0;
-    padding:1.75rem clamp(1rem, 4vw, 1.5rem) 4.5rem;
+    /* the masthead is in the normal flow now, so 100vh on the main column
+       would add a second viewport of empty scroll below every page */
+    min-height:0;
+    padding:1.5rem var(--gutter) 4.5rem;
+    padding-bottom:calc(4.5rem + env(safe-area-inset-bottom));
   }
 
   .plate{
-    position:static; width:auto; inset:auto;
+    position:relative;
+    inset:auto;
+    width:auto;
+    z-index:30;
     display:grid;
-    grid-template-columns:auto minmax(0,1fr) auto;
-    grid-template-areas:"av id lang" "nav nav nav";
+    grid-template-columns:auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "av id lang"
+      "nav nav nav";
     align-items:center;
-    column-gap:.9rem; row-gap:.9rem;
-    padding:16px clamp(1rem, 4vw, 1.5rem) 14px;
+    column-gap:.875rem;
+    row-gap:.75rem;
+    padding:.875rem var(--gutter);
+    padding-top:calc(.875rem + env(safe-area-inset-top));
+    background:transparent;
+    -webkit-backdrop-filter:none;
+    backdrop-filter:none;
     border-right:0;
-    border-bottom:2px solid var(--ink);
+    border-bottom:1px solid var(--line);
     overflow:visible;
   }
+
   .avatar-ring{ grid-area:av; }
-  .identity{ grid-area:id; min-width:0; }
-  .lang{ grid-area:lang; margin-top:0; }
-  .nav{ grid-area:nav; }
+  .identity{ grid-area:id; min-width:0; margin-top:0; }
+  .plate-controls{ grid-area:lang; margin-top:0; }
+  .nav{ grid-area:nav; margin-top:0; }
 
-  .avatar{ width:46px; height:46px; box-shadow:3px 3px 0 var(--spot); }
-  .identity .name{ margin:0 0 .1rem; font-size:1.08rem; }
-  .identity .role{
-    font-size:.78rem; line-height:1.5;
-    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  .avatar{
+    width:2.75rem; height:2.75rem;
+    border-radius:.875rem;
   }
-
-  .rule-line{ display:none; }
+  .identity .name{
+    margin-bottom:.1rem;
+    font-size:1.0625rem;
+  }
+  .identity .role{
+    font-size:.75rem;
+    line-height:1.4;
+    display:-webkit-box;
+    /* the appearance switch takes width away from this column, so the tagline
+       gets a third line rather than an ellipsis it did not have before */
+    -webkit-line-clamp:3;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+  }
 
   .nav ul{
-    display:flex;
+    flex-direction:row;
+    gap:.375rem;
     overflow-x:auto;
+    overscroll-behavior-x:contain;
     scrollbar-width:none;
+    padding:.125rem 0;
+    margin:-.125rem 0;
   }
   .nav ul::-webkit-scrollbar{ display:none; }
-  .nav li + li{ border-top:0; }
   .nav a{
+    gap:.5rem;
+    min-height:2.5rem;
+    padding:.4rem .7rem;
+    border-radius:.625rem;
+    font-size:.875rem;
     white-space:nowrap;
-    padding:.3rem .85rem;
-    border-left:1px solid var(--rule);
   }
-  .nav li:first-child a{ border-left:0; padding-left:.1rem; }
-  .nav a::before{ display:none; }
-  .nav a[aria-current="page"]{
-    text-decoration:underline;
-    text-decoration-thickness:2px;
-    text-decoration-color:var(--spot);
-    text-underline-offset:4px;
-  }
+  .nav-icon{ width:1rem; height:1rem; }
 
   .plate-foot{ display:none; }
 
-  /* stacked rows: baseline alignment no longer applies across the column,
-     so both blocks switch to start alignment to keep one clean left edge */
-  .index div{ flex-direction:column; align-items:flex-start; gap:.2rem; padding:1rem 0; }
-  .index dt{ flex:none; }
+  .display{ margin-bottom:1rem; }
+  .lede{ margin-bottom:1.75rem; }
+}
 
-  .row{ flex-direction:column; align-items:flex-start; gap:.4rem; padding:1.1rem 0; }
+/* A narrower sidebar before the masthead breakpoint, so the content keeps air. */
+@media (min-width:960px) and (max-width:1200px){
+  :root{ --sidebar-w:16.25rem; }
+  .plate{ padding-inline:1.125rem; }
 }
 
 /* ============================================================
-   WIDE SCREENS — the sheet takes a second column
-   Rail, then a sheet. Until here the sheet has been one column of
-   type, which on a 2560px screen left two thirds of the stock bare.
-   Past 106rem there is room to print it as two columns, the way a
-   broadside would: the reading column, and beside it the things that
-   are not reading — the picture, the rundown table, the list of posts.
-   A dated rail is the one list that cannot move over: it is read as a
-   single row of date, rule and card, so it stays in the reading column.
-   Both columns are the same module, so the sheet keeps one edge down
-   the middle and one down the right, and the heading — the sheet's
-   own line — runs the whole of it. 106rem is where the second column
-   comes out around 590px and grows to the full module by about
-   1850px; below it the split would squeeze a ledger under 500px, so
-   the sheet stays one column there, and the paper left over is a
-   margin, which a sheet is entitled to.
+   PHONE
    ============================================================ */
-@media (min-width: 106rem){
-  .panel.is-active{
-    display:grid;
-    grid-template-columns:minmax(0, var(--measure)) minmax(0, var(--measure));
-    column-gap:var(--col-gap);
-    align-content:start;
-    max-width:calc(var(--measure) * 2 + var(--col-gap));
+@media (max-width:640px){
+  body{ font-size:1rem; }
+
+  .main{
+    padding-top:1.25rem;
+    padding-bottom:3.5rem;
+    padding-bottom:calc(3.5rem + env(safe-area-inset-bottom));
   }
-  /* the heading is the sheet's own line, not the column's */
-  .panel > .display{ grid-column:1 / -1; }
-  /* the reading column … */
-  .panel > .lede,
-  .panel > p,
-  .panel > .prose,
-  .panel > .section-title,
-  .panel > .filter,
-  .panel > .taglist,
-  .panel > .timeline{ grid-column:1; }
-  /* … and what sits beside it. The timeline is deliberately not in this list:
-     a dated rail is one continuous object — its date, its rule and its card are
-     a single row and cannot be split over two columns — so it keeps the first
-     column, which is also what puts the dates on the same left edge as the
-     heading and the lede they belong to. */
-  .panel > .video,
-  .panel > .index,
-  .panel > .rows{ grid-column:2; }
+
+  .plate{ row-gap:.625rem; }
+
+  /* When the nav actually overflows on a phone, fade only the edge that still
+     has destinations beyond it. A half-visible item then reads as "there is
+     more", not as a clipped word — and the edge with nothing beyond it stays
+     crisp. The classes are measured by revealActiveNav() on render, scroll and
+     resize. */
+  .nav ul.is-scrollable.at-start:not(.at-end){
+    -webkit-mask-image:linear-gradient(to right, #000 0, #000 calc(100% - 1rem), transparent 100%);
+    mask-image:linear-gradient(to right, #000 0, #000 calc(100% - 1rem), transparent 100%);
+  }
+  .nav ul.is-scrollable.at-end:not(.at-start){
+    -webkit-mask-image:linear-gradient(to right, transparent 0, #000 1rem);
+    mask-image:linear-gradient(to right, transparent 0, #000 1rem);
+  }
+  .nav ul.is-scrollable:not(.at-start):not(.at-end){
+    -webkit-mask-image:linear-gradient(to right, transparent 0, #000 1rem, #000 calc(100% - 1rem), transparent 100%);
+    mask-image:linear-gradient(to right, transparent 0, #000 1rem, #000 calc(100% - 1rem), transparent 100%);
+  }
+
+  .display{
+    margin-bottom:.875rem;
+    font-size:clamp(1.95rem, 8.5vw, 2.65rem);
+    letter-spacing:-.03em;
+    line-height:1.09;
+  }
+  .lede{
+    margin-bottom:1.5rem;
+    font-size:1.0625rem;
+    line-height:1.6;
+  }
+  .section-title{
+    margin-top:2.5rem;
+    padding-top:1.25rem;
+    margin-bottom:1.25rem;
+    font-size:1.25rem;
+  }
+
+  /* four columns do not fit a phone: the service and its handle share the
+     first line, the account gets the second one to itself */
+  .channels{ margin-bottom:2rem; }
+  .channel{
+    grid-template-columns:minmax(0, 1fr) auto;
+    grid-template-areas:
+      "plat handle"
+      "acct arrow";
+    row-gap:.15rem;
+    column-gap:.75rem;
+    padding:.75rem 0;
+  }
+  .channel-account{ font-size:1rem; }
+  .channel-handle{ font-size:.6875rem; }
+
+  .video > a,
+  .video > img,
+  .video-embed,
+  .prose figure img{ border-radius:var(--r-md); }
+  .video{ margin-bottom:1.5rem; }
+
+  .rows,
+  .index,
+  .explore-grid{ border-radius:var(--r-md); }
+
+  .feature{
+    padding:1.25rem 3rem 1.25rem 1.25rem;
+    border-radius:var(--r-md);
+  }
+  .feature-title{ font-size:1.5rem; }
+  .feature-note{ font-size:.9375rem; }
+  a.feature::after{ right:1.25rem; }
+  .article-list{ margin-top:1rem; }
+  .explore-card{ padding:1.125rem 2.75rem 1.125rem 1.125rem; }
+
+  .row{
+    flex-direction:column;
+    align-items:flex-start;
+    gap:.3rem;
+    padding:1rem 2.75rem 1rem 1.125rem;
+  }
+  .row-meta{ margin-top:.1rem; }
+
+  .index{ padding:0 1.125rem; }
+  .index div{
+    flex-direction:column;
+    align-items:flex-start;
+    gap:.2rem;
+    padding:.9rem 0;
+  }
+  .index dt{ flex:none; }
+
+  .timeline{ --t-date:0rem; --t-rail:0rem; }
+  .timeline::before{ display:none; }
+  .tl-item{
+    grid-template-columns:1fr;
+    grid-template-areas:
+      "date"
+      "card";
+    row-gap:.35rem;
+    padding:1rem 0;
+    border-bottom:1px solid var(--line);
+  }
+  .tl-item:last-child{ border-bottom:0; }
+  .tl-date{
+    padding:0;
+    font-size:.6875rem;
+    letter-spacing:.06em;
+  }
+  .tl-date::before{
+    content:"";
+    display:inline-block;
+    width:.3125rem; height:.3125rem;
+    margin-right:.45rem;
+    border-radius:50%;
+    background:var(--accent);
+    vertical-align:.08em;
+  }
+  .tl-node{ display:none; }
+  .tl-card{
+    margin-left:0;
+    padding:0;
+  }
+  .tl-title{ font-size:1.125rem; }
+  .tl-head{ gap:.4rem .6rem; }
+  .tl-tail{ margin-left:0; }
+
+  .filter{ margin-bottom:1.5rem; }
+
+  .taglist{ margin-top:1.75rem; }
+
+  .foot{ margin-top:2.5rem; }
+
+  .post-back{ margin-bottom:1.5rem; }
+  .prose h2{ font-size:1.375rem; }
+}
+
+@media (max-width:380px){
+  :root{ --gutter:1rem; }
+  /* at this width every pixel the controls borrow comes out of the name, so
+     the header tightens as a whole rather than letting "Susie Meow" break */
+  .plate{ column-gap:.625rem; }
+  .avatar{ width:2.375rem; height:2.375rem; border-radius:.75rem; }
+  .identity .name{ font-size:1rem; }
+  .identity .role{ font-size:.6875rem; }
+  .plate-controls{ gap:.25rem; }
+  .theme-toggle{ width:1.75rem; height:1.75rem; }
+  .theme-icon{ width:1.0625rem; height:1.0625rem; }
+  .lang{ font-size:.75rem; }
+  .lang button{ padding:.28rem .5rem; }
+  .nav a{ padding:.42rem .6rem; font-size:.8125rem; }
+  .display{ font-size:1.9rem; }
+  .tl-card{ padding:.9rem 1rem; }
+}
+
+/* ============================================================
+   ACCESSIBILITY PREFERENCES
+   ============================================================ */
+/* A change of appearance eases rather than snaps: a hard dark↔light step
+   reads as a flash. The rule lives behind a class that the script keeps for
+   140ms, so nothing carries a colour transition for the rest of the session,
+   and it sits inside a no-preference query — "reduce motion" gets the
+   instantaneous swap without having to know this exists.
+
+   On the duration — this is the whole design of the thing, so it is worth
+   writing down. Every continuous palette fade dips through low contrast, and
+   no easing shape avoids it: the paper has to travel from #f5f5f7 to #0b0b0d,
+   so it must sweep across the luminance the secondary greys sit at (#6e6e73 /
+   #8e8e93) and for a beat grey text lands on grey paper. Measured, the trough
+   is about 1.2:1 whatever curve or length is chosen; only a zero-length swap
+   dodges it, and a zero-length swap *is* the flash this rule exists to avoid.
+   So the curve is not the thing to tune — the length is. At 100ms the trough
+   fits in one or two frames (~20ms): an ease you can see, with no *sustained*
+   moment of unreadable text. At 180ms the same trough is three or four frames
+   wide and starts to read as a flicker. Shorter is smoother here, which is the
+   whole counter-intuitive point.
+
+   Only chromatic properties are listed. `transform` and `opacity` are left
+   out on purpose: they would drag every hover lift and every panel dissolve
+   into the palette change, which is motion nobody asked for. The sun/moon
+   cross-fade keeps its own transition because .theme-icon is excluded. */
+@media (prefers-reduced-motion: no-preference){
+  html.theme-swap *:not(.theme-icon),
+  html.theme-swap *::before,
+  html.theme-swap *::after{
+    transition-property:background-color, border-color, color, box-shadow !important;
+    transition-duration:var(--dur-swap) !important;
+    transition-timing-function:var(--ease-out) !important;
+  }
 }
 
 @media (prefers-reduced-motion: reduce){
-  *{ animation:none !important; transition:none !important; }
+  *,*::before,*::after{
+    animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.01ms !important;
+    scroll-behavior:auto !important;
+  }
+  .panel.is-leaving,
+  .panel.is-entering{ animation:none !important; }
+  .video > a:hover,
+  .video > a:hover img,
+  .post-back .link:hover,
+  .nav a:active,
+  .lang button:active,
+  .filter-btn:active,
+  a.feature:hover{ transform:none; }
+
+  /* keep each arrow in its resting shape; only remove the hover travel */
+  a.row:hover::after{ transform:translateY(-50%) rotate(45deg); }
+  .row[href].row--external:hover::after{ transform:translateY(-50%); }
+  a.feature:hover::after{ transform:translateY(-50%) rotate(45deg); }
+  a.feature.feature--external:hover::after{ transform:translateY(-50%); }
+  .explore-card:hover::after{ transform:rotate(45deg); }
 }
+
+@media (prefers-reduced-transparency: reduce){
+  .plate{
+    background:var(--bg);
+    -webkit-backdrop-filter:none;
+    backdrop-filter:none;
+  }
+}
+
+@media (prefers-contrast: more){
+  :root{
+    --text-2:var(--text);
+    --text-3:#424245;
+    --line:rgba(0, 0, 0, .22);
+    --line-strong:rgba(0, 0, 0, .42);
+  }
+  .plate{
+    background:var(--bg);
+    -webkit-backdrop-filter:none;
+    backdrop-filter:none;
+  }
+  .rows,
+  .index,
+  .feature,
+  .explore-grid,
+  .video > a,
+  .prose figure img,
+  .post-back .link{ border-color:var(--line-strong); }
+  .link{ text-decoration-thickness:2px; }
+}
+
+/* keyed to the theme in use, not to the system preference: once the reader
+   picks an appearance, this has to follow the pick */
+@media (prefers-contrast: more){
+  :root[data-theme="dark"]{
+    --text-3:#d1d1d6;
+    --line:rgba(255, 255, 255, .32);
+    --line-strong:rgba(255, 255, 255, .52);
+  }
+}
+
 </style>
 </head>
 
 <body>
 <a class="skip" href="#main" id="skip">Skip to content</a>
 
-<!-- ============ RAIL ============ -->
+<!-- ============ SIDEBAR ============ -->
 <header class="plate">
   <span class="avatar-ring">
     <!-- same idea as the favicon: a real src from the start, so that if /data cannot be
-         read (double-clicking the file) the rail shows an avatar instead of a broken image -->
-    <img class="avatar" id="avatar" src="assets/avatar-youtube.jpg" alt="" width="74" height="74" />
+         read (double-clicking the file) the sidebar shows an avatar instead of a broken image -->
+    <img class="avatar" id="avatar" src="assets/avatar-youtube.jpg" alt="" width="64" height="64" />
   </span>
 
   <div class="identity">
@@ -809,19 +1732,33 @@ p:last-child{ margin-bottom:0; }
     <p class="role" id="profileRole"></p>
   </div>
 
-  <hr class="rule-line" />
-
   <nav class="nav" id="nav" aria-label="Sections">
     <ul id="navList"></ul>
   </nav>
 
-  <div class="lang" id="langSwitch" role="group"></div>
+  <div class="plate-controls">
+    <div class="lang" id="langSwitch" role="group"></div>
+    <!-- the label is written by renderSidebar(), which knows the language -->
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to dark theme">
+      <svg class="theme-icon theme-icon--sun" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+        <circle cx="12" cy="12" r="4.25"/>
+        <path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.2 5.2l1.55 1.55M17.25 17.25l1.55 1.55M18.8 5.2l-1.55 1.55M6.75 17.25l-1.55 1.55"/>
+      </svg>
+      <svg class="theme-icon theme-icon--moon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+        <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/>
+      </svg>
+    </button>
+  </div>
 
   <p class="plate-foot"><span class="dot" aria-hidden="true"></span><span id="profileStatus"></span></p>
 </header>
 
 <!-- ============ CONTENT (rendered from /data) ============ -->
-<main class="main" id="main"></main>
+<main class="main" id="main" tabindex="-1"></main>
+<!-- route changes are announced, but focus is left where the reader put it -->
+<p class="sr-only" id="routeStatus" role="status" aria-live="polite"></p>
 
 <script>
 /* ============================================================
@@ -882,9 +1819,12 @@ function localized(value, lang) {
    A newline becomes <br>, so one paragraph can hold a short stack of lines (a list of
    handles, say) without needing a block type for it. A blank line becomes a wider gap
    (.line-gap), so the same paragraph can still set its lead-in and closing line apart
-   from the list in the middle. */
+   from the list in the middle. A line that starts with "-" is a hand-written list line:
+   the hyphen becomes a bullet mark rather than sitting against the first letter. */
 function withBreaks(html) {
-  return html.replace(/\n[ \t]*\n/g, '<span class="line-gap"></span>')
+  /* the dash may end this rich part — the link it introduces is the next one */
+  return html.replace(/\n-[ \t]*$/g, '\n<span class="list-mark" aria-hidden="true"></span>')
+             .replace(/\n[ \t]*\n/g, '<span class="line-gap"></span>')
              .replace(/\n/g, '<br>');
 }
 
@@ -904,6 +1844,26 @@ function rich(value) {
 
 function field(value) { return rich(localized(value, state.lang)); }
 function plain(value) { return esc(localized(value, state.lang)); }
+
+/* Plain text for places that are not markup: document.title, textContent and
+   attributes set through the DOM. `plain()` escapes for an HTML string; using
+   it there would put a literal "&amp;" in the tab title and the live region. */
+function plainText(value) {
+  var v = localized(value, state.lang);
+  return (v === null || v === undefined) ? '' : String(v);
+}
+
+/* Plain text for a rich value: an array of parts becomes the concatenation of
+   its text, which keeps a summary usable inside a link without nesting links. */
+function summaryText(value) {
+  var v = localized(value, state.lang);
+  if (Array.isArray(v)) {
+    return v.map(function (part) {
+      return part && part.text !== undefined ? String(part.text) : '';
+    }).join('');
+  }
+  return (v === null || v === undefined) ? '' : String(v);
+}
 
 /* ---------- loading ---------- */
 function loadJSON(path) {
@@ -932,40 +1892,135 @@ function fail(path, reason) {
     '</div>';
 }
 
-/* ---------- rail ---------- */
-function renderRail() {
+/* ---------- sidebar ---------- */
+/* A small, consistent set of line marks for the four known sections. The nav
+   itself is data-driven, so an id this file has not met yet still gets a mark
+   rather than an empty slot. */
+function navIcon(id) {
+  var paths = {
+    home: '<path d="M3.75 10.5 12 3.75l8.25 6.75"/>' +
+          '<path d="M5.75 9.5v9.25A1.75 1.75 0 0 0 7.5 20.5h9a1.75 1.75 0 0 0 1.75-1.75V9.5"/>' +
+          '<path d="M9.75 20.5v-5.5h4.5v5.5"/>',
+    blog: '<rect x="4.25" y="3.75" width="15.5" height="16.5" rx="3"/>' +
+          '<path d="M8 8.5h8M8 12h8M8 15.5h5"/>',
+    works: '<path d="M12 3.75l1.65 4.6 4.6 1.65-4.6 1.65L12 16.25l-1.65-4.6-4.6-1.65 4.6-1.65L12 3.75Z"/>' +
+           '<path d="M18.5 15.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7.7-1.8Z"/>',
+    elsewhere: '<circle cx="12" cy="12" r="8.25"/>' +
+               '<path d="M3.75 12h16.5"/>' +
+               '<path d="M12 3.75c2.2 2.2 3.4 5.1 3.4 8.25s-1.2 6.05-3.4 8.25c-2.2-2.2-3.4-5.1-3.4-8.25S9.8 5.95 12 3.75Z"/>'
+  };
+  var path = paths[id] || '<circle cx="12" cy="12" r="3.25"/>';
+  return '<svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+         'stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" ' +
+         'aria-hidden="true" focusable="false">' + path + '</svg>';
+}
+
+/* ---------- appearance ----------
+   The palette is in CSS; this only decides which one is on. `data-theme` is
+   the single writer, so a system change and a reader's choice can never both
+   claim the page. The stored value is checked first and the system is the
+   fallback — that ordering *is* the priority rule, in one line. */
+var THEME_KEY = 'site-theme';
+var systemAppearance = window.matchMedia('(prefers-color-scheme: dark)');
+var swapTimer = null;
+
+function storedTheme() {
+  try {
+    var v = localStorage.getItem(THEME_KEY);
+    return (v === 'light' || v === 'dark') ? v : '';
+  } catch (e) { return ''; }
+}
+
+function currentTheme() {
+  return document.documentElement.getAttribute('data-theme') ||
+         (systemAppearance.matches ? 'dark' : 'light');
+}
+
+/* The label names the move, the icon shows where it leads, so a screen reader
+   and the picture agree. Both follow the current language. */
+function paintTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+
+  var meta = document.getElementById('themeColor');
+  if (meta) { meta.setAttribute('content', theme === 'dark' ? '#0b0b0d' : '#f5f5f7'); }
+
+  var btn = document.getElementById('themeToggle');
+  if (!btn) { return; }
+  var words = (state.site && state.site.themeToggle) || {};
+  var fallback = theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme';
+  btn.setAttribute('aria-label', plainText(words[theme === 'dark' ? 'toLight' : 'toDark'] || fallback));
+}
+
+function setTheme(theme, instant) {
+  var root = document.documentElement;
+
+  /* The palette cross-fades over --dur-swap; the class outlives it by a
+     margin so the tail of that transition is not cut off. Leaving the class
+     on would make every later hover transition colours it never meant to. */
+  if (!instant && canAnimate()) {
+    root.classList.add('theme-swap');
+    if (swapTimer) { window.clearTimeout(swapTimer); }
+    swapTimer = window.setTimeout(function () {
+      root.classList.remove('theme-swap');
+      swapTimer = null;
+    }, 140);
+  } else {
+    root.classList.remove('theme-swap');
+  }
+
+  paintTheme(theme);
+}
+
+function toggleTheme() {
+  var next = currentTheme() === 'dark' ? 'light' : 'dark';
+  try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+  setTheme(next);
+}
+
+/* The system is a default, not an override: once the reader has picked an
+   appearance, later changes to the OS setting leave their choice alone. */
+systemAppearance.addEventListener('change', function (e) {
+  if (storedTheme()) { return; }
+  setTheme(e.matches ? 'dark' : 'light');
+});
+
+document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+
+function renderSidebar() {
   var profile = state.profile || {};
   var avatar = profile.avatar || {};
 
   var img = document.getElementById('avatar');
   if (avatar.src) { img.src = avatar.src; }
-  img.alt = plain(avatar.alt);
+  img.alt = plainText(avatar.alt);
 
-  document.getElementById('profileName').textContent = plain(profile.name);
+  document.getElementById('profileName').textContent = plainText(profile.name);
   document.getElementById('profileRole').innerHTML = field(profile.role);
   document.getElementById('profileStatus').innerHTML = field(profile.status);
-  document.getElementById('skip').textContent = plain(state.site.skipLink);
+  document.getElementById('skip').textContent = plainText(state.site.skipLink);
 
   if (avatar.src) { document.getElementById('favicon').href = profile.favicon || avatar.src; }
-  document.getElementById('metaDescription').content = plain(state.site.metaDescription);
+  document.getElementById('metaDescription').content = plainText(state.site.metaDescription);
 
   document.documentElement.lang = (state.lang === 'zh') ? 'zh-CN' : 'en';
+  document.getElementById('nav').setAttribute('aria-label',
+    state.lang === 'zh' ? '页面导航' : 'Sections');
 
   /* nav */
   document.getElementById('navList').innerHTML = (state.site.nav || []).map(function (item) {
     return '<li><a href="#' + esc(item.id) + '" data-nav="' + esc(item.id) + '">' +
-           field(item.label) + '</a></li>';
+           navIcon(item.id) +
+           '<span class="nav-label">' + field(item.label) + '</span></a></li>';
   }).join('');
 
-  /* language switch */
-  /* language switch — the slash is its own element, not a ::after on the button:
-     the active language is marked with a border-bottom, and a pseudo-element would
-     drag that rule out under the slash and its margins too. */
+  /* language switch — a segmented control. The slash span stays in the markup
+     for the old two-word treatment, but the stylesheet hides it. */
   var group = document.getElementById('langSwitch');
-  group.setAttribute('aria-label', plain(state.site.languageGroupLabel));
+  group.setAttribute('aria-label', plainText(state.site.languageGroupLabel));
   group.innerHTML = (state.site.languages || []).map(function (lang, i) {
     return (i ? '<span class="lang-sep" aria-hidden="true">/</span>' : '') +
-           '<button type="button" data-lang="' + esc(lang.code) + '" aria-pressed="' +
+           '<button type="button" data-lang="' + esc(lang.code) + '" lang="' +
+           esc(lang.code === 'zh' ? 'zh-CN' : lang.code) + '" aria-pressed="' +
            (lang.code === state.lang ? 'true' : 'false') + '">' + esc(lang.label) + '</button>';
   }).join('');
   Array.prototype.forEach.call(group.querySelectorAll('button'), function (b) {
@@ -973,10 +2028,19 @@ function renderRail() {
       var code = b.getAttribute('data-lang');
       if (code === state.lang) { return; }
       state.lang = code;
-      try { localStorage.setItem(STORE_KEY, code); } catch (e) {}
+      try { localStorage.setItem(STORE_KEY, code); } catch (err) {}
       render();
+      /* the header was rebuilt, so the button that had focus is gone. Put
+         focus back on the same choice in the new markup, for keyboard,
+         assistive-tech and pointer activation alike. */
+      var next = group.querySelector('button[data-lang="' + code + '"]');
+      if (next) { next.focus({ preventScroll: true }); }
     });
   });
+
+  /* the switch's label is prose, so it has to be re-written when the
+     language changes — the theme itself does not change with it */
+  paintTheme(currentTheme());
 }
 
 /* ---------- panels ---------- */
@@ -1039,13 +2103,88 @@ function videoFigure(video) {
          '</figure>';
 }
 
+/* The home page ends with data-driven ways into the other panels. Labels come
+   from site.nav and descriptions from each panel's existing lede, so nothing
+   extra needs to be added to an old config for this block to work. */
+function renderExplore(currentId) {
+  var items = (state.site.nav || []).filter(function (item) {
+    return item.id !== currentId && state.panels[item.id];
+  });
+  if (!items.length) { return ''; }
+
+  var label = state.lang === 'zh' ? '探索更多' : 'Explore more';
+  var tiles = items.map(function (item) {
+    var panel = state.panels[item.id];
+    var summary = summaryText(panel.lede).replace(/\s+/g, ' ').trim();
+    return '<a class="explore-card" href="#' + esc(item.id) + '">' +
+             '<span class="explore-icon" aria-hidden="true">' + navIcon(item.id) + '</span>' +
+             '<span class="explore-body">' +
+               '<span class="explore-title">' + field(item.label) + '</span>' +
+               (summary ? '<span class="explore-desc">' + esc(summary) + '</span>' : '') +
+             '</span>' +
+           '</a>';
+  }).join('');
+
+  return '<nav class="explore" aria-labelledby="home-explore-title">' +
+           '<h2 class="section-title" id="home-explore-title">' + esc(label) + '</h2>' +
+           '<div class="explore-grid">' + tiles + '</div>' +
+         '</nav>';
+}
+
+/* Four channels, one line each. The service is the label, the account is the
+   name, the handle is the reference — three registers of the same fact, which
+   is why they read as a row instead of a sentence. All of it comes from
+   data/home.json; nothing here is written into the markup. */
+function renderChannels(block) {
+  var items = (block && block.items) || [];
+  if (!items.length) { return ''; }
+
+  var html = '<div class="channels">';
+  if (block.label) {
+    html += '<p class="channels-lead">' + field(block.label) + '</p>';
+  }
+  html += '<ul class="channels-list">' + items.map(function (item) {
+    /* an entry without a url is still worth listing, it just is not a link */
+    var tag = item.url ? 'a' : 'div';
+    var link = item.url ? ' href="' + esc(item.url) + '"' : '';
+    return '<li><' + tag + ' class="channel"' + link + '>' +
+             '<span class="channel-platform">' + field(item.platform) + '</span>' +
+             '<span class="channel-account">' + field(item.account) + '</span>' +
+             (item.handle ? '<span class="channel-handle">' + field(item.handle) + '</span>' : '') +
+           '</' + tag + '></li>';
+  }).join('') + '</ul>';
+  if (block.summary) {
+    html += '<p class="channels-summary">' + field(block.summary) + '</p>';
+  }
+  return html + '</div>';
+}
+
+/* The open-source note is a footnote to the page, so it gets its own labelled
+   block rather than a fifth row in the list above. */
+function renderSource(block) {
+  if (!block || !block.url) { return ''; }
+  var html = '<aside class="source">';
+  if (block.label) { html += '<p class="source-label">' + field(block.label) + '</p>'; }
+  if (block.text) { html += '<p class="source-text">' + field(block.text) + '</p>'; }
+  html += '<a class="link source-url" href="' + esc(block.url) + '">' + plain(block.url) + '</a>';
+  return html + '</aside>';
+}
+
 function renderHome(id, data) {
   var html = '<h1 class="display" id="' + esc(id) + '-title">' + field(data.heading) + '</h1>';
   html += '<p class="lede">' + field(data.lede) + '</p>';
 
-  (data.paragraphs || []).forEach(function (para) {
-    html += '<p>' + field(para) + '</p>';
-  });
+  /* Two shapes are understood: the structured one home.json carries now, and
+     the plain paragraph list that older copies of the file use. The old one
+     still renders exactly as it always did — no migration required. */
+  if (data.channels) {
+    html += renderChannels(data.channels);
+    html += renderSource(data.openSource);
+  } else {
+    (data.paragraphs || []).forEach(function (para) {
+      html += '<p>' + field(para) + '</p>';
+    });
+  }
 
   var videoHtml = videoFigure(data.video);
 
@@ -1064,6 +2203,8 @@ function renderHome(id, data) {
     html += videoHtml;
   }
 
+  html += renderExplore(id);
+
   /* no footnote here — renderPanels() appends it once for every layout */
   return html;
 }
@@ -1072,18 +2213,44 @@ function renderRows(items) {
   if (!items || !items.length) { return ''; }
   return '<ul class="rows">' + items.map(function (item) {
     var inner = '<span class="row-main">' +
-                  '<h3 class="row-title">' + field(item.title) + '</h3>' +
+                  '<h2 class="row-title">' + field(item.title) + '</h2>' +
                   '<p class="row-note">' + field(item.note) + '</p>' +
                 '</span>';
     if (item.meta) { inner += '<span class="row-meta">' + field(item.meta) + '</span>'; }
 
     /* "post" opens a page inside the site; "url" sends the reader away */
     var href = item.post ? '#post/' + item.post : (item.url || '');
+    var external = !item.post && !!item.url;
+    var cls = external ? 'row row--external' : 'row';
     return '<li>' +
-      (href ? '<a class="row" href="' + esc(href) + '">' + inner + '</a>'
+      (href ? '<a class="' + cls + '" href="' + esc(href) + '">' + inner + '</a>'
             : '<div class="row">' + inner + '</div>') +
       '</li>';
   }).join('') + '</ul>';
+}
+
+/* A list whose entries open in-site posts is an article index, not a directory.
+   The first entry gets a featured treatment and the rest keep the compact row
+   list. The shape of the existing items decides this — no new config field is
+   required, so older list configs keep working unchanged. */
+function renderArticleList(items) {
+  if (!items || !items.length) { return ''; }
+  var first = items[0];
+  var href = first.post ? '#post/' + first.post : (first.url || '');
+  var external = !first.post && !!first.url;
+  var cls = external ? 'feature feature--external' : 'feature';
+  var meta = first.meta ? '<p class="feature-meta">' + field(first.meta) + '</p>' : '';
+  var note = first.note ? '<p class="feature-note">' + field(first.note) + '</p>' : '';
+  var body = '<div class="feature-body">' +
+               '<h2 class="feature-title">' + field(first.title) + '</h2>' +
+               meta +
+               note +
+             '</div>';
+  var feature = href
+    ? '<a class="' + cls + '" href="' + esc(href) + '">' + body + '</a>'
+    : '<div class="feature">' + body + '</div>';
+  var rest = items.slice(1);
+  return feature + (rest.length ? '<div class="article-list">' + renderRows(rest) + '</div>' : '');
 }
 
 /* The types a page actually carries, in the order the data first mentions them.
@@ -1149,22 +2316,29 @@ function renderTimeline(data) {
   var map = (data && data.tagLabels) || {};
   return '<ol class="timeline">' + items.map(function (item) {
     var title = field(item.title);
-    if (item.url) { title = '<a class="link" href="' + esc(item.url) + '">' + title + '</a>'; }
+    if (item.url) { title = '<a class="link tl-link" href="' + esc(item.url) + '">' + title + '</a>'; }
     var keys = item.tags || [];
     if (typeof keys === 'string') { keys = [keys]; }
     var plates = keys.map(function (key) {
       var label = map[key] === undefined ? { en: key, zh: key } : map[key];
       return '<span class="tl-tag">' + field(label) + '</span>';
     }).join('');
+    /* tags and kind share one right-aligned tail, so a card with both never
+       spreads them across the title line */
+    var tail = (plates || item.kind)
+      ? '<span class="tl-tail">' +
+          (plates ? '<span class="tl-tags">' + plates + '</span>' : '') +
+          (item.kind ? '<span class="tl-kind">' + field(item.kind) + '</span>' : '') +
+        '</span>'
+      : '';
     return '<li class="tl-item"' +
       (keys.length ? ' data-tags="' + esc(keys.join(' ')) + '"' : '') + '>' +
       '<span class="tl-date">' + field(item.date) + '</span>' +
       '<span class="tl-node" aria-hidden="true"></span>' +
       '<div class="tl-card">' +
         '<div class="tl-head">' +
-          '<h3 class="tl-title">' + title + '</h3>' +
-          plates +
-          (item.kind ? '<span class="tl-kind">' + field(item.kind) + '</span>' : '') +
+          '<h2 class="tl-title">' + title + '</h2>' +
+          tail +
         '</div>' +
         '<p class="tl-note">' + field(item.note) + '</p>' +
       '</div>' +
@@ -1233,7 +2407,7 @@ function renderPost(post, owner) {
 
   var html = '<p class="post-back"><a class="link" href="#' + esc(owner) + '">← ' +
              field(label) + '</a></p>';
-  html += '<h1 class="display">' + field(post.title) + '</h1>';
+  html += '<h1 class="display" id="post-title">' + field(post.title) + '</h1>';
   if (post.date) { html += '<p class="post-meta">' + esc(post.date) + '</p>'; }
   if (post.lede) { html += '<p class="lede">' + field(post.lede) + '</p>'; }
   html += '<div class="prose">' + renderBlocks(post.body) + '</div>';
@@ -1257,7 +2431,14 @@ function renderPanels() {
        (the data audit reads these names instead of keeping its own copy) */
     var body = '';
     if (item.layout === 'home') { body = renderHome(item.id, data); }
-    else if (item.layout === 'list') { body = heading + renderRows(data.items); }
+    else if (item.layout === 'list') {
+      /* A list that opens in-site posts is an article index; a list of outbound
+         links is a directory. The item shape decides, so both old configs keep
+         the same layout name and the same fields. */
+      var entries = data.items || [];
+      var hasPosts = entries.some(function (entry) { return entry && entry.post; });
+      body = heading + (hasPosts ? renderArticleList(entries) : renderRows(entries));
+    }
     else if (item.layout === 'timeline') {
       /* filter, then the rail, then the tags the rail is filed under — the
          control above the thing it rules, the legend below it */
@@ -1281,7 +2462,7 @@ function renderPanels() {
 /* ---------- the type filter ----------
    Which entries are on screen is written onto the rows themselves, and the
    buttons are re-stamped to match, so the markup is always the whole truth:
-   a screen reader, the print stylesheet and the next language switch all see
+   a screen reader and the next language switch both see
    the filtered state rather than having to ask this script for it. */
 function applyTagFilter() {
   Array.prototype.forEach.call(document.querySelectorAll('#main > .panel'), function (panel) {
@@ -1295,7 +2476,7 @@ function applyTagFilter() {
   });
 }
 
-/* one listener for every filter on the sheet rather than one per button: the
+/* one listener for every filter on the page rather than one per button: the
    panels are rebuilt on a language switch, and listeners bound to them would be
    swept away with the markup they were bound to */
 document.addEventListener('click', function (e) {
@@ -1305,6 +2486,16 @@ document.addEventListener('click', function (e) {
   applyTagFilter();
 });
 
+/* A link inside the content that changes the route will hide the panel that
+   had focus before the hashchange event fires. Note the click in the capture
+   phase, before any header or content handler, so revealPanel knows whether
+   focus should follow the new heading. Any other click clears the note. */
+var contentNavAt = 0;
+document.addEventListener('click', function (e) {
+  var link = e.target && e.target.closest ? e.target.closest('#main a[href^="#"]') : null;
+  contentNavAt = link ? Date.now() : 0;
+}, true);
+
 /* ---------- section switching ---------- */
 function highlightNav(navId) {
   Array.prototype.forEach.call(document.querySelectorAll('.nav a[data-nav]'), function (a) {
@@ -1313,33 +2504,86 @@ function highlightNav(navId) {
   });
 }
 
+/* Route changes are announced politely for screen-reader users. Focus is not
+   moved, so the keyboard position stays where the reader put it. */
+function announceRoute(label) {
+  var el = document.getElementById('routeStatus');
+  if (el) { el.textContent = label || ''; }
+}
+
+/* On the masthead layout the nav is a horizontal scroller. Bring the current
+   section into view when it is not already visible, without moving the page,
+   and tell the stylesheet which edges still have destinations beyond them so
+   only those edges fade. */
+function updateNavEdges() {
+  var list = document.querySelector('.nav ul');
+  if (!list) { return; }
+  var scrollable = list.scrollWidth > list.clientWidth + 1;
+  list.classList.toggle('is-scrollable', scrollable);
+  list.classList.toggle('at-start', list.scrollLeft <= 1);
+  list.classList.toggle('at-end',
+    list.scrollLeft + list.clientWidth >= list.scrollWidth - 1);
+}
+
+function revealActiveNav() {
+  var list = document.querySelector('.nav ul');
+  if (!list) { return; }
+  updateNavEdges();
+  var active = list.querySelector('a[aria-current="page"]');
+  if (!list.classList.contains('is-scrollable') || !active) { return; }
+
+  var listRect = list.getBoundingClientRect();
+  var activeRect = active.getBoundingClientRect();
+  if (activeRect.left >= listRect.left && activeRect.right <= listRect.right) { return; }
+
+  var left = list.scrollLeft + (activeRect.left - listRect.left) -
+             (listRect.width - activeRect.width) / 2;
+  list.scrollTo({
+    left: Math.max(0, left),
+    behavior: canAnimate() ? 'smooth' : 'auto'
+  });
+}
+
+var navMeasureFrame = null;
+window.addEventListener('resize', function () {
+  if (navMeasureFrame) { window.cancelAnimationFrame(navMeasureFrame); }
+  navMeasureFrame = window.requestAnimationFrame(revealActiveNav);
+});
+
+/* The nav list element survives every render (only its innerHTML is replaced),
+   so one listener here covers the page's whole life. */
+var navScroller = document.getElementById('navList');
+if (navScroller) {
+  navScroller.addEventListener('scroll', updateNavEdges, { passive:true });
+}
+
 /* ---------- what is on screen ----------
-   A change of sheet is a two-step move: the sheet on screen dims, and the
-   incoming one is printed in its place. Two steps rather than a cross-dissolve
-   because the panels sit in the normal flow (they are different heights, so they
-   have to) and their words lie straight on the paper — fading one into the other
-   would double-expose two sets of text. The two steps meet at --dip, where
-   neither sheet is legible and neither is missing, so the handover is invisible
-   and the whole move reads as one continuous dip rather than a blink.
+   A change of panel is a two-step move: the panel on screen dips to a faint
+   trace, and the incoming one is set in its place, rising back to full strength.
+   Two steps rather than a cross-dissolve because the panels sit in the normal
+   flow (they are different heights, so they have to) and two sets of text
+   faded through each other would double-expose. The phases meet at --dip
+   (12% opacity), where neither state is legible and neither is missing, so the
+   handover is invisible and the move reads as one continuous settle.
 
    Three cases go straight to the last step, because none of them is a jump:
    the first paint; a language re-render, which rebuilds every panel and so
    leaves nothing on screen marked active; and a reader who has asked the system
    for less motion. The out duration is mirrored by .panel.is-leaving in the
    stylesheet — change both together. */
-var LEAVE_MS = 120;
+var LEAVE_MS = 140;
 var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-var leaveTimer = null;    /* the handoff queued behind a sheet that is lifting off */
-var pendingShow = null;   /* {sheet, write} waiting on that handoff */
+var leaveTimer = null;    /* the handoff queued behind a panel that is lifting off */
+var pendingShow = null;   /* {panel, write} waiting on that handoff */
 
-function canAnimate() { return !reducedMotion.matches; }
+function canAnimate() { return !(reducedMotion && reducedMotion.matches); }
 
 function mainPanels() {
   return Array.prototype.slice.call(document.querySelectorAll('#main > .panel'));
 }
 
-/* the one sheet currently on screen, if any */
-function sheetOnScreen() {
+/* the one panel currently on screen, if any */
+function panelOnScreen() {
   var found = null;
   mainPanels().forEach(function (p) {
     if (p.classList.contains('is-active')) { found = p; }
@@ -1353,37 +2597,54 @@ function forgetHandoff() {
   if (leaveTimer) { window.clearTimeout(leaveTimer); leaveTimer = null; }
 }
 
-/* put one sheet on screen and hide the rest, with no move at all */
-function showOnly(sheet) {
+/* put one panel on screen and hide the rest, with no move at all */
+function showOnly(panel) {
   forgetHandoff();
   mainPanels().forEach(function (p) {
     p.classList.remove('is-leaving', 'is-entering');
-    var on = (p === sheet);
+    var on = (p === panel);
     p.classList.toggle('is-active', on);
     p.hidden = !on;
   });
 }
 
+/* When navigation starts inside the content (a row, the post back link), focus
+   would otherwise be left on an element that is now hidden. Move it to the new
+   panel's heading; nav and language controls outside the panel keep their own
+   focus. The heading is not interactive, so its outline is suppressed in CSS. */
+function focusPanelHeading(panel) {
+  if (!panel) { return; }
+  var heading = panel.querySelector('h1');
+  if (!heading) { return; }
+  heading.setAttribute('tabindex', '-1');
+  heading.focus({ preventScroll: true });
+}
+
 /* One place decides what is on screen, so a post and a panel cannot both show.
-   `write`, when given, fills the sheet in — it is held back to the moment the
-   sheet is printed, which is what makes one post to the next a real move even
+   `write`, when given, fills the panel in — it is held back to the moment the
+   panel is shown, which is what makes one post to the next a real move even
    though both of them are the same element. */
-function revealPanel(sheet, navId, write) {
-  var onScreen = sheetOnScreen();
+function revealPanel(panel, navId, write) {
+  var onScreen = panelOnScreen();
+  var fromContentLink = (Date.now() - contentNavAt) < 5000;
+  var focusWasInside = fromContentLink || !!(onScreen && onScreen.contains(document.activeElement));
+  if (fromContentLink) { contentNavAt = 0; }
   highlightNav(navId);
   window.scrollTo(0, 0);
+  window.requestAnimationFrame(revealActiveNav);
 
   /* the same element simply re-read (a language re-render of one post) is not a
-     change of sheet either */
-  if (!canAnimate() || !onScreen || (onScreen === sheet && !write)) {
+     change of panel either */
+  if (!canAnimate() || !onScreen || (onScreen === panel && !write)) {
     if (write) { write(); }
-    showOnly(sheet);
+    showOnly(panel);
+    if (focusWasInside) { focusPanelHeading(panel); }
     return;
   }
 
-  /* a second click while the first sheet is still lifting off: re-aim, don't
-     restart, so the outgoing sheet never flashes back to full ink */
-  pendingShow = { sheet: sheet, write: write };
+  /* a second click while the first panel is still lifting off: re-aim, don't
+     restart, so the outgoing panel never flashes back to full strength */
+  pendingShow = { panel: panel, write: write, focus: focusWasInside };
   if (onScreen.classList.contains('is-leaving')) { return; }
 
   onScreen.classList.remove('is-entering');
@@ -1392,25 +2653,26 @@ function revealPanel(sheet, navId, write) {
   leaveTimer = window.setTimeout(land, LEAVE_MS);
 }
 
-/* the incoming sheet takes the ink */
+/* the incoming panel takes over */
 function land() {
   leaveTimer = null;
   var job = pendingShow;
   pendingShow = null;
   /* the tree can be rebuilt underneath us (a language re-render) while we wait */
-  if (!job || !job.sheet.parentNode) { return; }
+  if (!job || !job.panel.parentNode) { return; }
 
   if (job.write) { job.write(); }
 
   mainPanels().forEach(function (p) {
     p.classList.remove('is-leaving');
-    var on = (p === job.sheet);
+    var on = (p === job.panel);
     p.classList.toggle('is-active', on);
     p.hidden = !on;
   });
 
-  void job.sheet.offsetWidth;             /* flush the display change … */
-  job.sheet.classList.add('is-entering'); /* … so the ink rises from nothing */
+  void job.panel.offsetWidth;             /* flush the display change … */
+  job.panel.classList.add('is-entering'); /* … so the panel rises from the dip */
+  if (job.focus) { focusPanelHeading(job.panel); }
 }
 
 /* The enter class takes itself off when its animation ends — one listener for
@@ -1432,7 +2694,8 @@ function showPanel(requested) {
   revealPanel(document.getElementById(requested), requested);
 
   var current = (state.site.nav || []).filter(function (n) { return n.id === requested; })[0];
-  document.title = current ? plain(current.title) : '';
+  document.title = current ? plainText(current.title) : '';
+  announceRoute(current ? plainText(current.label) : '');
 }
 
 /* A post is fetched the first time it is opened and then kept, so switching
@@ -1450,13 +2713,15 @@ function showPost(slug) {
       section = document.createElement('section');
       section.className = 'panel';
       section.id = 'post-panel';
+      section.setAttribute('aria-labelledby', 'post-title');
       main.appendChild(section);
     }
     var html = renderPost(post, owner);
-    document.title = plain(post.title) + ' — ' + plain((state.profile || {}).name || '');
+    document.title = plainText(post.title) + ' — ' + plainText((state.profile || {}).name || '');
+    announceRoute(plainText(post.title));
     /* the markup is handed over rather than pasted in: when this post replaces
        another in the very same element, the old words have to stay up until the
-       sheet has lifted off */
+       panel has lifted off */
     revealPanel(section, owner, function () { section.innerHTML = html; });
   };
 
@@ -1481,7 +2746,7 @@ function applyRoute(route) {
 }
 
 function render() {
-  renderRail();
+  renderSidebar();
   renderPanels();
   applyRoute(state.current || routeFromHash() || 'home');
 }

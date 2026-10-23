@@ -16,19 +16,20 @@
 | **纯静态，没有后端** | 只有 HTML / CSS / 原生 JavaScript。没有数据库、没有服务端，页面自己不会去请求任何第三方接口 |
 | **零依赖、零构建** | 仓库里没有 `package.json`，也没有 `node_modules`；不需要 npm，不需要打包。文件丢到任何静态服务器上就能跑 |
 | **内容与代码分离** | 唯一的事实来源是 `data/*.json`，`index.html` 只负责骨架和排版 |
-| **中英双语** | 右上角一键切换，选择记在浏览器里，刷新后保持不变 |
+| **中英双语** | 侧边栏底部一键切换，选择记在浏览器里，刷新后保持不变 |
+| **浅色 / 深色** | 语言开关旁边一个按钮切换。第一次进来跟随系统；手动选过之后，就一直按你选的来，系统再变也不覆盖它 |
 | **单页多板块** | 侧边栏点击切换，地址栏会变成 `#blog`、`#works`，可以直接分享某一板块；文章是 `#post/<文件名>` |
 | **站内文章** | 博客正文放在 `data/posts/`，**一篇文章一个 JSON 文件**，在 `data/blog.json` 里填一个 `post` 字段就链过去。同样不用碰代码 |
 | **最新视频自动同步** | GitHub Actions 每 6 小时抓一次 YouTube，把结果写回仓库（见 [第 9 节](#9-最新视频是怎么自动更新的)） |
-| **自适应排版** | 桌面和移动端共享同一套版式，版心宽度固定；宽屏自动多排一栏 |
+| **自适应排版** | 桌面和移动端共享同一套版式，版心宽度固定；窄屏时侧边栏折成顶部一条，导航可以横向滑动 |
 
 **技术栈**：原生 HTML + CSS + JavaScript（ES5 写法，没有框架、没有编译器）＋ Python 3 标准库（只用在那个同步脚本上）＋ GitHub Actions ＋ GitHub Pages。整个仓库**没有一行需要构建的代码**。
 
 **许可**：[MIT](LICENSE) —— 自由使用、自由修改、商用也行，保留版权声明即可。个人内容那部分的说明见 [第 13 节](#13-许可与来源)。
 
-**默认状态下唯一的外部资源**是 Google Fonts（Archivo + Noto Sans SC）。断网时字体会退化成系统字体，其余功能不受影响。
+**默认状态下没有任何外部资源**：字体用系统自带的那一套（macOS 上是 SF Pro，Windows 上是 Segoe UI），不下载、不发请求。断网也照常显示。
 
-> 唯一的例外：如果你在 `data/home.json` 里填了 B 站 BV 号，首页那个播放器会额外从 B 站加载（见[例 9](#例-9让首页方框里直接播-b-站视频)）。不填就只是本地文件加一份字体。
+> 唯一的例外：如果你在 `data/home.json` 里填了 B 站 BV 号，首页那个播放器会额外从 B 站加载（见[例 9](#例-9让首页方框里直接播-b-站视频)）。不填就完全是本地文件。
 
 ---
 
@@ -84,7 +85,7 @@
 ├── data/                    ← ★ 网站内容，你只改这里
 │   ├── site.json                站点设置：语言、导航菜单、标签页标题
 │   ├── profile.json             侧边栏：头像、名字、一句话简介
-│   ├── home.json                主页：大标题、导语、正文、最新视频、Lately 表格
+│   ├── home.json                主页：大标题、导语、平台账号、最新视频、Lately 表格
 │   ├── blog.json                博客板块的条目列表（只放标题和摘要）
 │   ├── posts/                   博客正文：★ 一篇文章一个文件
 │   │   └── how-this-site-was-built.json
@@ -114,7 +115,7 @@
 |---|---|---|
 | `data/site.json` | 默认语言、导航菜单（数量 / 顺序 / 名字）、标签页标题 | ✅ 可改 |
 | `data/profile.json` | 侧边栏头像、名字、一句话简介、底部状态行 | ✅ 可改 |
-| `data/home.json` | 主页大标题、导语、正文段落、最新视频、Lately 表格、页脚 | ✅ 可改 |
+| `data/home.json` | 主页大标题、导语、平台账号、开源说明、最新视频、Lately 表格、页脚 | ✅ 可改 |
 | `data/blog.json` | 博客板块的标题、导语、条目列表（**只是目录**） | ✅ 可改 |
 | `data/posts/` | 博客**正文**，一篇文章一个 `.json` 文件 | ✅ 可加可改（见 [第 6 节](#6-数据文件字段详解)） |
 | `data/works.json` | 作品与成就板块的时间轴条目 | ✅ 可改 |
@@ -329,6 +330,8 @@ python3 -m http.server 8000
 | `defaultLanguage` | ✅ | 访客第一次进来显示哪种语言，填 `en` 或 `zh` |
 | `languages` | ✅ | 支持的语言列表。`code` 是代号（`en` / `zh`），`label` 是按钮上显示的文字 |
 | `languageGroupLabel` | ⭕ | 语言开关的无障碍标签，一般不用改 |
+| `themeToggle.toDark` | ⭕ | 切到深色时按钮的无障碍标签（双语），例如「切换到深色模式」 |
+| `themeToggle.toLight` | ⭕ | 切到浅色时按钮的无障碍标签（双语） |
 | `skipLink` | ⭕ | 键盘 Tab 键跳转用的提示文字 |
 | `metaDescription` | ⭕ | 给搜索引擎看的简介（不会显示在页面上） |
 | `nav` | ✅ | ★ 导航列表，条数不限，顺序就是菜单顺序 |
@@ -360,7 +363,11 @@ python3 -m http.server 8000
 |---|---|---|
 | `heading` | ✅ | 页面最大的那个标题（双语） |
 | `lede` | ⭕ | 标题下面的导语（双语） |
-| `paragraphs` | ⭕ | 正文段落数组，每组是一段；想加第三段就再复制一组 |
+| `channels.label` | ⭕ | 平台那一组的引导句（双语） |
+| `channels.summary` | ⭕ | 列表下方的一句总结（双语） |
+| `channels.items` | ⭕ | ★ 平台账号数组。每项 `platform`（平台名，双语）+ `account`（账号名）+ `handle`（用户名 / UID，可省）+ `url`（主页地址）。**每加一组 `{ }` 就多一行** |
+| `openSource` | ⭕ | 开源说明区块：`label`（小标签）+ `text`（一句话，双语）+ `url`（仓库地址）。不写就整块隐藏 |
+| `paragraphs` | ⭕ | **旧写法，仍然支持**：正文段落数组。文件里没有 `channels` 时才按这个渲染，老配置不用迁移 |
 | `video.enabled` | ⭕ | `true` 显示最新视频，`false` 整块隐藏 |
 | `video.bvid` | ⭕ | 填一个 BV 号，方框里就直接播**B 站**这条视频。留空则显示自动同步到的最新一条。见[例 9](#例-9让首页方框里直接播-b-站视频) |
 | `video.alt` | ⭕ | 封面图的替代文字（双语），给读屏软件用 |
@@ -372,7 +379,7 @@ python3 -m http.server 8000
 | `lately.items` | ⭕ | 表格行数组。每行 `label`（左列名）+ `value`（右侧内容，可用规则 5 的链接写法） |
 | `footnote` | ⭕ | 页面最底部的小字说明（双语） |
 
-**主页从上到下的顺序**是：大标题 → 导语 → 正文段落 → 「Lately」小节（小节标题下先是视频框，再是表格）→ 页脚说明。
+**主页从上到下的顺序**是：大标题 → 导语 → 平台账号（`channels`）→ 开源说明（`openSource`）→ 「Lately」小节（小节标题下先是视频框，再是表格）→ 页脚说明。
 
 **「最新视频」到底显示哪一条？** 按这三步依次判断，前一步有就不看后一步：
 
@@ -400,7 +407,7 @@ python3 -m http.server 8000
 | `title` | ✅ | 标题（双语） |
 | `note` | ⭕ | 标题下面的说明文字（双语） |
 | `meta` | ⭕ | 最右边那列小字：博客里通常写日期（`"2026-09-30"`），「在别处找我」里通常写账号（`"UID 458056589"`）。**可以写双语，也可以直接写字符串**（两种语言一样时用后者更省事） |
-| `url` | ⭕ | 点击这一行跳到**站外**网址。留空字符串 `""` 或删掉这行，这一行就不可点击 |
+| `url` | ⭕ | 点击这一行跳到**站外**网址。邮箱这类没有网址的写 `mailto:地址`，点了直接开写邮件。留空字符串 `""` 或删掉这行，这一行就不可点击 |
 | `post` | ⭕ | 填一个**站内文章**的 slug（`data/posts/` 里那个文件的文件名，去掉 `.json`）。填了就点进站内的文章页，**并且优先于 `url`**。只对 `data/blog.json` 有意义 |
 
 ### `data/posts/` —— 博客正文
@@ -580,7 +587,7 @@ data/posts/how-this-site-was-built.json   →   网址  #post/how-this-site-was-
       "title": { "en": "Email", "zh": "邮箱" },
       "note": { "en": "…", "zh": "…" },
       "meta": "you@example.com",
-      "url": ""
+      "url": "mailto:you@example.com"
     },
     {
       "title": { "en": "微博 Weibo", "zh": "微博 Weibo" },
@@ -593,6 +600,8 @@ data/posts/how-this-site-was-built.json   →   网址  #post/how-this-site-was-
     }
   ],
 ```
+
+> 邮箱这类不用网址也能点的，`url` 写 `mailto:你的邮箱`，点了会直接打开写邮件；`url` 留空 `""` 才是「这一行不可点击」。
 
 拉到底 → 填 Commit message（例如 `add Weibo link`）→ **Commit changes**。
 
@@ -887,7 +896,7 @@ GitHub 的规则：**公开仓库被 fork 之后，其中的定时工作流会�
 | `data/sources.json` | `youtube.channelId`、`bilibili.mid` |
 | `data/profile.json` | 名字、简介、头像路径 |
 | `data/site.json` | 标签页标题、`metaDescription`、导航文案 |
-| `data/home.json` | 大标题、导语、正文、`video.bvid` |
+| `data/home.json` | 大标题、导语、平台账号、`video.bvid` |
 | `data/works.json` | 作品与成就时间轴 |
 | `data/elsewhere.json` | 各平台链接 |
 | `data/blog.json` | 博客条目 |
