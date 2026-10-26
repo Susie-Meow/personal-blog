@@ -55,7 +55,16 @@
   --bg:          #f5f5f7;
   --surface:     #ffffff;
   --surface-2:   #fbfbfd;
-  --material:    rgba(250, 250, 252, .72);
+  /* the sidebar is its own sheet of paper, tinted with the accent so the two
+     columns read as two materials rather than one field with a line drawn on it.
+     One colour in two forms: --side-bg is the tint as a film over the canvas,
+     which is all the desktop column ever has behind it; --side-solid is that
+     same tint already flattened, for the two places that paint without a blur
+     (the masthead, and anything without backdrop-filter — those must still get
+     the tint, not the bare canvas). Change one, change the other. */
+  --side-bg:     rgba(255, 240, 246, .9);
+  --side-solid:  #fef1f6;
+  --side-line:   rgba(196, 0, 95, .14);
   --nav-active:  #ffffff;
   --segment:     #ffffff;
   --fill:        rgba(118, 118, 128, .12);
@@ -77,7 +86,6 @@
   --accent-soft:  rgba(196, 0, 95, .09);
   --accent-soft-2:rgba(196, 0, 95, .16);
   --accent-line:  rgba(196, 0, 95, .42);
-  --accent-glow:  rgba(196, 0, 95, .065);
 
   /* depth — soft, never theatrical */
   --shadow-sm:   0 1px 2px rgba(0, 0, 0, .05), 0 1px 1px rgba(0, 0, 0, .02);
@@ -90,9 +98,9 @@
   --r-lg: 1.125rem;
   --r-pill: 999px;
 
-  /* layout */
+  /* layout — one column. --measure is the page: the sheet, the cards, the rules
+     and the running text all end on the same right edge, at every width. */
   --sidebar-w: 18rem;
-  --shell: 60rem;
   --measure: 47.5rem;
   --gutter: clamp(1.25rem, 4vw, 3.5rem);
 
@@ -126,7 +134,9 @@
   --bg:          #0b0b0d;
   --surface:     #1c1c1e;
   --surface-2:   #202022;
-  --material:    rgba(20, 20, 22, .72);
+  --side-bg:     rgba(20, 20, 22, .72);
+  --side-solid:  #111113;
+  --side-line:   rgba(255, 255, 255, .10);
   --nav-active:  #2c2c2e;
   --segment:     #48484a;
   --fill:        rgba(118, 118, 128, .24);
@@ -145,7 +155,6 @@
   --accent-soft:  rgba(255, 107, 157, .14);
   --accent-soft-2:rgba(255, 107, 157, .22);
   --accent-line:  rgba(255, 107, 157, .55);
-  --accent-glow:  rgba(255, 107, 157, .09);
 
   --shadow-sm:   0 1px 2px rgba(0, 0, 0, .40);
   --shadow-card: 0 1px 2px rgba(0, 0, 0, .35), 0 10px 30px -14px rgba(0, 0, 0, .60);
@@ -176,19 +185,6 @@ body{
   font-optical-sizing:auto;
   -webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;
-}
-
-/* A barely-there ambient wash gives the flat canvas a light source.
-   It is fixed and inert, so it never competes with content or motion. */
-body::before{
-  content:"";
-  position:fixed;
-  inset:0;
-  z-index:0;
-  pointer-events:none;
-  background:
-    radial-gradient(48rem 32rem at 82% -10rem, var(--accent-glow), transparent 62%),
-    radial-gradient(40rem 30rem at 4% 108%, rgba(120, 120, 128, .05), transparent 60%);
 }
 
 a{ color:inherit; }
@@ -258,7 +254,7 @@ button{ font:inherit; }
   --dip:.12;
   display:none;
   width:100%;
-  max-width:var(--shell);
+  max-width:var(--measure);
   margin-inline:auto;
 }
 .panel.is-active{ display:block; }
@@ -295,17 +291,18 @@ button{ font:inherit; }
   flex-direction:column;
   padding:1.75rem 1.25rem 1.25rem;
   padding-bottom:calc(1.25rem + env(safe-area-inset-bottom));
-  background:var(--material);
+  background:var(--side-bg);
   -webkit-backdrop-filter:saturate(180%) blur(24px);
   backdrop-filter:saturate(180%) blur(24px);
-  border-right:1px solid var(--line);
+  border-right:1px solid var(--side-line);
   overflow-y:auto;
   overscroll-behavior:contain;
 }
 
-/* No glass support: fall back to the solid canvas rather than a washy panel. */
+/* No glass support: fall back to the same tint, pre-composited, rather than a
+   washy panel or the plain canvas (which would drop the tint entirely). */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))){
-  .plate{ background:var(--bg); }
+  .plate{ background:var(--side-solid); }
 }
 
 .avatar-ring{
@@ -497,7 +494,7 @@ h1,h2,h3{
 }
 
 .display{
-  max-width:var(--shell);
+  max-width:var(--measure);
   margin:0 0 1.25rem;
   font-size:clamp(2.35rem, 5vw, 3.5rem);
   font-weight:700;
@@ -740,7 +737,7 @@ a.channel:active .channel-account{ color:var(--accent-hover); }
    ============================================================ */
 .rows{
   list-style:none;
-  max-width:var(--shell);
+  max-width:var(--measure);
   margin:0;
   padding:0;
   background:var(--surface);
@@ -832,7 +829,7 @@ a.row:hover .row-title{ color:var(--accent); }
 .feature{
   position:relative;
   display:block;
-  max-width:var(--shell);
+  max-width:var(--measure);
   margin:0;
   padding:2rem 4rem 2rem 2rem;
   background:var(--surface);
@@ -946,7 +943,7 @@ a.feature.feature--external:hover::after{
 /* ============================================================
    EXPLORE — data-driven ways into the other panels
    ============================================================ */
-.explore{ max-width:var(--shell); }
+.explore{ max-width:var(--measure); }
 .explore .section-title{ max-width:none; margin-bottom:1.25rem; }
 .explore-grid{
   display:flex;
@@ -1383,11 +1380,14 @@ a.feature.feature--external:hover::after{
     row-gap:.75rem;
     padding:.875rem var(--gutter);
     padding-top:calc(.875rem + env(safe-area-inset-top));
-    background:transparent;
+    /* the same sheet as the sidebar, laid along the top instead of the left.
+       Blur is off here, so the tint is painted flat: a film with nothing to
+       blur over would just be the same colour with a needless alpha. */
+    background:var(--side-solid);
     -webkit-backdrop-filter:none;
     backdrop-filter:none;
     border-right:0;
-    border-bottom:1px solid var(--line);
+    border-bottom:1px solid var(--side-line);
     overflow:visible;
   }
 
@@ -1415,22 +1415,23 @@ a.feature.feature--external:hover::after{
     overflow:hidden;
   }
 
+  /* The row wraps instead of scrolling. A hidden scrollbar made the last
+     destination invisible on every phone — two of four items were either cut
+     mid-word or off-screen with nothing to say they existed. Wrapping costs a
+     line of height on the narrowest screens and hides nothing. */
   .nav ul{
     flex-direction:row;
-    gap:.375rem;
-    overflow-x:auto;
-    overscroll-behavior-x:contain;
-    scrollbar-width:none;
+    flex-wrap:wrap;
+    gap:.3rem;
     padding:.125rem 0;
     margin:-.125rem 0;
   }
-  .nav ul::-webkit-scrollbar{ display:none; }
   .nav a{
-    gap:.5rem;
+    gap:.45rem;
     min-height:2.5rem;
-    padding:.4rem .7rem;
+    padding:.35rem .55rem;
     border-radius:.625rem;
-    font-size:.875rem;
+    font-size:.8125rem;
     white-space:nowrap;
   }
   .nav-icon{ width:1rem; height:1rem; }
