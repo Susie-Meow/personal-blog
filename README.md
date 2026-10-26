@@ -404,11 +404,15 @@ python3 -m http.server 8000
 
 | 字段 | 必填 | 说明 |
 |---|---|---|
-| `title` | ✅ | 标题（双语） |
-| `note` | ⭕ | 标题下面的说明文字（双语） |
-| `meta` | ⭕ | 最右边那列小字：博客里通常写日期（`"2026-09-30"`），「在别处找我」里通常写账号（`"UID 458056589"`）。**可以写双语，也可以直接写字符串**（两种语言一样时用后者更省事） |
+| `title` | ⭕ | 标题（双语）。**`data/blog.json` 用它**（文章标题） |
+| `platform` | ⭕ | 「在别处找我」里这一条的平台名（双语），例如 `"Bilibili"` / `"哔哩哔哩（B 站）"`。它渲染成账号上方那行小字 |
+| `account` | ⭕ | 「在别处找我」里这个平台上的账号名（**只有一份，不分语言**，和首页的 `channels` 一样），例如 `"澄闪大猫猫"`。渲染成条目里那行大字。邮箱没有单独的账号名，就把地址写在这里 |
+| `note` | ⭕ | 下面那行说明文字（双语） |
+| `meta` | ⭕ | 最右边那列小字：博客里通常写日期（`"2026-09-30"`），「在别处找我」里写 UID、`@handle` 这类附加标识（`"UID 458056589"`）。**可以写双语，也可以直接写字符串**（两种语言一样时用后者更省事） |
 | `url` | ⭕ | 点击这一行跳到**站外**网址。邮箱这类没有网址的写 `mailto:地址`，点了直接开写邮件。留空字符串 `""` 或删掉这行，这一行就不可点击 |
 | `post` | ⭕ | 填一个**站内文章**的 slug（`data/posts/` 里那个文件的文件名，去掉 `.json`）。填了就点进站内的文章页，**并且优先于 `url`**。只对 `data/blog.json` 有意义 |
+
+> 「在别处找我」的一条 = **平台 + 账号**两段，各自一个字段，不再写成 `"Bilibili — 澄闪大猫猫"` 这样一句：平台是标签，账号是你真正要扫的那行。
 
 ### `data/posts/` —— 博客正文
 
@@ -570,7 +574,8 @@ data/posts/how-this-site-was-built.json   →   网址  #post/how-this-site-was-
 
 ```json
       {
-        "title": { "en": "微博 Weibo", "zh": "微博 Weibo" },
+        "platform": "Weibo",
+        "account": "澄闪猫猫",
         "note": {
           "en": "Short clips and photos between uploads.",
           "zh": "两次更新之间会在这儿发点和照片。"
@@ -584,13 +589,14 @@ data/posts/how-this-site-was-built.json   →   网址  #post/how-this-site-was-
 
 ```json
     {
-      "title": { "en": "Email", "zh": "邮箱" },
+      "platform": { "en": "Email", "zh": "邮箱" },
+      "account": "you@example.com",
       "note": { "en": "…", "zh": "…" },
-      "meta": "you@example.com",
       "url": "mailto:you@example.com"
     },
     {
-      "title": { "en": "微博 Weibo", "zh": "微博 Weibo" },
+      "platform": "Weibo",
+      "account": "澄闪猫猫",
       "note": {
         "en": "Short clips and photos between uploads.",
         "zh": "两次更新之间会在这儿发点和照片。"
@@ -601,6 +607,8 @@ data/posts/how-this-site-was-built.json   →   网址  #post/how-this-site-was-
   ],
 ```
 
+> `platform` 和 `account` 是两段：平台名在上、账号在下。两种语言写法一样时（`Weibo`、`GitHub`）`platform` 可以直接写字符串，不一样时写 `{ "en": …, "zh": … }`。
+>
 > 邮箱这类不用网址也能点的，`url` 写 `mailto:你的邮箱`，点了会直接打开写邮件；`url` 留空 `""` 才是「这一行不可点击」。
 
 拉到底 → 填 Commit message（例如 `add Weibo link`）→ **Commit changes**。

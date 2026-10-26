@@ -1,5 +1,5 @@
 {
-  "_comment": "在别处找我的板块：标题、导语、链接条目列表、页脚说明。meta 是右侧那列小字（比如账号 UID），可以留空字符串。url 留空则这一条不可点击；邮箱这类没有网址的，url 写成 mailto:地址 照样能点。",
+  "_comment": "在别处找我的板块：标题、导语、链接条目列表、页脚说明。每条由「平台 + 账号」两段组成：platform 是平台名（双语），account 是这个平台上的账号（单语言，和 data/home.json 的 channels 一样），meta 是右侧那列小字（比如 UID），可以不写。url 留空则这一条不可点击；邮箱这类没有网址的，url 写成 mailto:地址 照样能点。",
   "heading": { "en": "Where else to find me.", "zh": "在别处找到我。" },
   "lede": {
     "en": "Same me everywhere～",
@@ -7,7 +7,8 @@
   },
   "items": [
     {
-      "title": { "en": "Bilibili — 澄闪大猫猫", "zh": "哔哩哔哩（B 站） —— 澄闪大猫猫" },
+      "platform": { "en": "Bilibili", "zh": "哔哩哔哩（B 站）" },
+      "account": "澄闪大猫猫",
       "note": {
         "en": "All videos will be posted here.",
         "zh": "所有视频都会发到这里哦。"
@@ -16,7 +17,8 @@
       "url": "https://space.bilibili.com/458056589"
     },
     {
-      "title": { "en": "YouTube — Susie Meow", "zh": "YouTube —— Susie Meow" },
+      "platform": "YouTube",
+      "account": "Susie Meow",
       "note": {
         "en": "This channel has been running since April 2020.",
         "zh": "这个账号在 2020 年 4 月注册。"
@@ -25,7 +27,8 @@
       "url": "https://www.youtube.com/@Susie-Meow"
     },
     {
-      "title": { "en": "GitHub — Susie Meow", "zh": "GitHub —— Susie Meow" },
+      "platform": "GitHub",
+      "account": "Susie Meow",
       "note": {
         "en": "Where I keep my code. If you like it, please give me a Star 🥹.",
         "zh": "放代码的地方，喜欢请点个 Star 喵，求你了喵🥹。"
@@ -34,16 +37,18 @@
       "url": "https://github.com/Susie-Meow"
     },
     {
-      "title": { "en": "Douyin — 澄闪猫猫", "zh": "抖音 —— 澄闪猫猫" },
+      "platform": { "en": "Douyin", "zh": "抖音" },
+      "account": "澄闪猫猫",
       "note": {
         "en": "The view counts here are really high (even though there's no creative income 😢).",
         "zh": "这里播放量好高欸（虽然没收入😢）。"
       },
-      "meta": { "en": "Hyacinewww", "zh": "Hyacinewww" },
+      "meta": "Hyacinewww",
       "url": "https://v.douyin.com/pN9yH7xQEcA/"
     },
     {
-      "title": { "en": "Xiaohongshu — 澄闪猫猫", "zh": "小红书 —— 澄闪猫猫" },
+      "platform": { "en": "Xiaohongshu", "zh": "小红书" },
+      "account": "澄闪猫猫",
       "note": {
         "en": "Where I post photos and short notes.",
         "zh": "图文内容会发在这里。"
@@ -52,12 +57,12 @@
       "url": "https://xhslink.cn/o/1eBuHLeHcQu"
     },
     {
-      "title": { "en": "Email", "zh": "邮箱" },
+      "platform": { "en": "Email", "zh": "邮箱" },
+      "account": "2026483959@qq.com",
       "note": {
         "en": "If there's anything urgent, you can reach me by email.",
         "zh": "有急事可以透过邮箱联系我。"
       },
-      "meta": { "en": "2026483959@qq.com", "zh": "2026483959@qq.com" },
       "url": "mailto:2026483959@qq.com"
     }
   ],

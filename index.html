@@ -797,12 +797,24 @@ a.row:hover::after{
 }
 
 .row-main{ flex:1 1 auto; min-width:0; }
+/* the platform is the label, the account the line you scan for — the same
+   split the channel table on the home panel uses, and the reason no row needs
+   a dash in its title any more */
+.row-platform{
+  margin:0 0 .125rem;
+  font-size:.8125rem;
+  line-height:1.4;
+  letter-spacing:.01em;
+  color:var(--text-3);
+  overflow-wrap:break-word;
+}
 .row-title{
   margin:0 0 .25rem;
   font-size:1.0625rem;
   font-weight:600;
   letter-spacing:-.012em;
   line-height:1.4;
+  overflow-wrap:break-word;
   transition:color var(--dur-fast) var(--ease-out);
 }
 a.row:hover .row-title{ color:var(--accent); }
@@ -2213,10 +2225,21 @@ function renderHome(id, data) {
 function renderRows(items) {
   if (!items || !items.length) { return ''; }
   return '<ul class="rows">' + items.map(function (item) {
-    var inner = '<span class="row-main">' +
-                  '<h2 class="row-title">' + field(item.title) + '</h2>' +
-                  '<p class="row-note">' + field(item.note) + '</p>' +
-                '</span>';
+    /* A row names two things: where it is, and who I am there. They used to be
+       one string joined by a dash — "Bilibili — 澄闪大猫猫" — which made the
+       reader parse a sentence to find the account, and read as prose in a list
+       that is really a table. Split in two, the platform becomes the label and
+       the account the line you scan for: the same hierarchy the home panel's
+       channel table already uses. Blog rows have no platform and keep the
+       single title. */
+    var main = '<span class="row-main">';
+    if (item.platform) {
+      main += '<p class="row-platform">' + field(item.platform) + '</p>';
+      if (item.account) { main += '<h2 class="row-title">' + field(item.account) + '</h2>'; }
+    }
+    else { main += '<h2 class="row-title">' + field(item.title) + '</h2>'; }
+    main += '<p class="row-note">' + field(item.note) + '</p></span>';
+    var inner = main;
     if (item.meta) { inner += '<span class="row-meta">' + field(item.meta) + '</span>'; }
 
     /* "post" opens a page inside the site; "url" sends the reader away */
